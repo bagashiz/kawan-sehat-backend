@@ -1,0 +1,15 @@
+# exclude any development-specific files
+.vscode/
+.idea/
+
+# exclude build artifacts
+bin/
+
+# exclude any development-specific files or directories
+tmp/
+log/
+*.env
+*.log
+*.test
+*.out
+coverage*

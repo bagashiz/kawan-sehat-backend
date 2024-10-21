@@ -1,0 +1,84 @@
+# https://taskfile.dev
+
+version: "3"
+
+dotenv:
+  - ".env"
+
+tasks:
+  default:
+    desc: "Gettings started"
+    cmds:
+      - task: install
+      - task: service:up
+      - task: test
+
+  install:
+    desc: "Install dependencies"
+    cmds:
+      - go mod download
+      - go install github.com/air-verse/air@latest
+      - go install github.com/pressly/goose/v3/cmd/goose@latest
+      - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+
+  service:up:
+    desc: "Start services"
+    cmd: docker compose up -d
+
+  service:down:
+    desc: "Stop services"
+    cmd: docker compose down
+
+  db:cli:
+    desc: "Connect to database using command line interface"
+    cmd: docker exec -it kawan-sehat_postgres psql -U postgres -d {{.DB_NAME}}
+
+  db:reset:
+    desc: "Reset database"
+    cmds:
+      - docker exec -it kawan-sehat_postgres dropdb --if-exists -U postgres {{.DB_NAME}}
+      - docker exec -it kawan-sehat_postgres createdb -U postgres {{.DB_NAME}}
+
+  migrate:create:
+    desc: "Create new database migration"
+    cmd: goose -dir internal/postgres/migrations create {{.CLI_ARGS}} sql
+
+  migrate:up:
+    desc: "Run database migrations"
+    cmd: goose -dir internal/postgres/migrations postgres {{.DB_URI}} up
+
+  migrate:down:
+    desc: "Rollback to previous database migration"
+    cmd: goose -dir internal/postgres/migrations postgres {{.DB_URI}} down
+
+  sqlc:
+    desc: "Generate SQLC code"
+    cmd: sqlc generate
+
+  dev:
+    desc: "Start development server"
+    cmd: air
+
+  lint:
+    desc: "Run linter"
+    cmd: golangci-lint run ./...
+
+  build:
+    desc: "Build binary"
+    cmd: go build -o ./bin/{{.APP_NAME}} ./cmd/main.go
+    requires:
+      vars:
+        - APP_NAME
+
+  start:
+    desc: "Start binary"
+    cmd: ./bin/{{.APP_NAME}}
+    requires:
+      vars:
+        - APP_NAME
+
+  test:
+    desc: "Run tests"
+    cmds:
+      - go test -v ./... -race -cover -timeout 30s -count 1 -coverprofile=coverage.out
+      - go tool cover -html=coverage.out -o coverage.html
