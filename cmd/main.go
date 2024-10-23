@@ -9,6 +9,8 @@ import (
 	"github.com/bagashiz/kawan-sehat-backend/internal/config"
 	"github.com/bagashiz/kawan-sehat-backend/internal/postgres"
 	"github.com/bagashiz/kawan-sehat-backend/internal/server"
+	"github.com/bagashiz/kawan-sehat-backend/internal/token"
+	"github.com/go-playground/validator/v10"
 )
 
 // entry point of the application.
@@ -47,6 +49,13 @@ func run(ctx context.Context, getEnv func(string) string) error {
 	if err := db.Migrate(); err != nil {
 		return err
 	}
+
+	_, err = token.New(cfg.Token)
+	if err != nil {
+		return err
+	}
+
+	_ = validator.New(validator.WithRequiredStructEnabled())
 
 	srv := server.New(cfg.App)
 
