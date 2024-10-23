@@ -9,8 +9,9 @@ import (
 type (
 	// Config holds the application configuration.
 	Config struct {
-		App *App
-		DB  *DB
+		App   *App
+		DB    *DB
+		Token *Token
 	}
 
 	// App holds the application configuration.
@@ -31,6 +32,13 @@ type (
 		Name     string
 		URI      string
 	}
+
+	// Token holds the token configuration.
+	Token struct {
+		Type     string
+		Secret   string
+		Duration string
+	}
 )
 
 // file is the name of the configuration file.
@@ -39,7 +47,7 @@ const file = ".env"
 // New returns a new Config instance.
 func New(getEnv func(string) string) (*Config, error) {
 	env := strings.ToLower(getEnv("APP_ENV"))
-	if env != "production" && env != "test" {
+	if env != "production" {
 		if err := godotenv.Load(file); err != nil {
 			return nil, err
 		}
@@ -60,6 +68,11 @@ func New(getEnv func(string) string) (*Config, error) {
 			Password: getEnv("DB_PASSWORD"),
 			Name:     getEnv("DB_NAME"),
 			URI:      getEnv("DB_URI"),
+		},
+		Token: &Token{
+			Type:     getEnv("TOKEN_TYPE"),
+			Secret:   getEnv("TOKEN_SECRET"),
+			Duration: getEnv("TOKEN_DURATION"),
 		},
 	}, nil
 }
