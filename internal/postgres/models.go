@@ -12,145 +12,145 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type UserAvatar string
+type AccountAvatar string
 
 const (
-	UserAvatarOldFemale   UserAvatar = "old_female"
-	UserAvatarOldMale     UserAvatar = "old_male"
-	UserAvatarYoungFemale UserAvatar = "young_female"
-	UserAvatarYoungMale   UserAvatar = "young_male"
+	AccountAvatarOldFemale   AccountAvatar = "old_female"
+	AccountAvatarOldMale     AccountAvatar = "old_male"
+	AccountAvatarYoungFemale AccountAvatar = "young_female"
+	AccountAvatarYoungMale   AccountAvatar = "young_male"
 )
 
-func (e *UserAvatar) Scan(src interface{}) error {
+func (e *AccountAvatar) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = UserAvatar(s)
+		*e = AccountAvatar(s)
 	case string:
-		*e = UserAvatar(s)
+		*e = AccountAvatar(s)
 	default:
-		return fmt.Errorf("unsupported scan type for UserAvatar: %T", src)
+		return fmt.Errorf("unsupported scan type for AccountAvatar: %T", src)
 	}
 	return nil
 }
 
-type NullUserAvatar struct {
-	UserAvatar UserAvatar
-	Valid      bool // Valid is true if UserAvatar is not NULL
+type NullAccountAvatar struct {
+	AccountAvatar AccountAvatar
+	Valid         bool // Valid is true if AccountAvatar is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullUserAvatar) Scan(value interface{}) error {
+func (ns *NullAccountAvatar) Scan(value interface{}) error {
 	if value == nil {
-		ns.UserAvatar, ns.Valid = "", false
+		ns.AccountAvatar, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.UserAvatar.Scan(value)
+	return ns.AccountAvatar.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullUserAvatar) Value() (driver.Value, error) {
+func (ns NullAccountAvatar) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.UserAvatar), nil
+	return string(ns.AccountAvatar), nil
 }
 
-type UserGender string
+type AccountGender string
 
 const (
-	UserGenderFemale      UserGender = "female"
-	UserGenderMale        UserGender = "male"
-	UserGenderUnspecified UserGender = "unspecified"
+	AccountGenderFemale      AccountGender = "female"
+	AccountGenderMale        AccountGender = "male"
+	AccountGenderUnspecified AccountGender = "unspecified"
 )
 
-func (e *UserGender) Scan(src interface{}) error {
+func (e *AccountGender) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = UserGender(s)
+		*e = AccountGender(s)
 	case string:
-		*e = UserGender(s)
+		*e = AccountGender(s)
 	default:
-		return fmt.Errorf("unsupported scan type for UserGender: %T", src)
+		return fmt.Errorf("unsupported scan type for AccountGender: %T", src)
 	}
 	return nil
 }
 
-type NullUserGender struct {
-	UserGender UserGender
-	Valid      bool // Valid is true if UserGender is not NULL
+type NullAccountGender struct {
+	AccountGender AccountGender
+	Valid         bool // Valid is true if AccountGender is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullUserGender) Scan(value interface{}) error {
+func (ns *NullAccountGender) Scan(value interface{}) error {
 	if value == nil {
-		ns.UserGender, ns.Valid = "", false
+		ns.AccountGender, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.UserGender.Scan(value)
+	return ns.AccountGender.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullUserGender) Value() (driver.Value, error) {
+func (ns NullAccountGender) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.UserGender), nil
+	return string(ns.AccountGender), nil
 }
 
-type UserRole string
+type AccountRole string
 
 const (
-	UserRolePatient UserRole = "patient"
-	UserRoleExpert  UserRole = "expert"
-	UserRoleAdmin   UserRole = "admin"
+	AccountRolePatient AccountRole = "patient"
+	AccountRoleExpert  AccountRole = "expert"
+	AccountRoleAdmin   AccountRole = "admin"
 )
 
-func (e *UserRole) Scan(src interface{}) error {
+func (e *AccountRole) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = UserRole(s)
+		*e = AccountRole(s)
 	case string:
-		*e = UserRole(s)
+		*e = AccountRole(s)
 	default:
-		return fmt.Errorf("unsupported scan type for UserRole: %T", src)
+		return fmt.Errorf("unsupported scan type for AccountRole: %T", src)
 	}
 	return nil
 }
 
-type NullUserRole struct {
-	UserRole UserRole
-	Valid    bool // Valid is true if UserRole is not NULL
+type NullAccountRole struct {
+	AccountRole AccountRole
+	Valid       bool // Valid is true if AccountRole is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullUserRole) Scan(value interface{}) error {
+func (ns *NullAccountRole) Scan(value interface{}) error {
 	if value == nil {
-		ns.UserRole, ns.Valid = "", false
+		ns.AccountRole, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.UserRole.Scan(value)
+	return ns.AccountRole.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullUserRole) Value() (driver.Value, error) {
+func (ns NullAccountRole) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.UserRole), nil
+	return string(ns.AccountRole), nil
 }
 
-type User struct {
+type Account struct {
 	ID             int64
 	Name           string
 	Nik            string
 	Email          string
 	Password       string
-	Gender         UserGender
-	Role           UserRole
-	Avatar         NullUserAvatar
+	Gender         AccountGender
+	Role           AccountRole
+	Avatar         NullAccountAvatar
 	IllnessHistory pgtype.Text
 	CreatedAt      time.Time
 	UpdatedAt      time.Time

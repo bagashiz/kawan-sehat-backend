@@ -9,7 +9,7 @@ import (
 )
 
 type Querier interface {
-	SelectUserByID(ctx context.Context, id int64) (User, error)
+	SelectAccountByID(ctx context.Context, id int64) (Account, error)
 }
 
 var _ Querier = (*Queries)(nil)
