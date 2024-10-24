@@ -5,41 +5,43 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Role represents the role of the user's account.
 type Role string
 
 const (
-	Patient Role = "patient"
-	Expert  Role = "expert"
-	Admin   Role = "admin"
+	Patient Role = "PATIENT"
+	Expert  Role = "EXPERT"
+	Admin   Role = "ADMIN"
 )
 
 // Avatar represents the avatar of the user's account.
 type Avatar string
 
 const (
-	OldFemale   Avatar = "old_female"
-	OldMale     Avatar = "old_male"
-	YoungFemale Avatar = "young_female"
-	YoungMale   Avatar = "young_male"
+	None        Avatar = "NONE"
+	OldFemale   Avatar = "OLD_FEMALE"
+	OldMale     Avatar = "OLD_MALE"
+	YoungFemale Avatar = "YOUNG_FEMALE"
+	YoungMale   Avatar = "YOUNG_MALE"
 )
 
 // Gender represents the gender of the user's account.
 type Gender string
 
 const (
-	Female      Gender = "female"
-	Male        Gender = "male"
-	Unspecified Gender = "unspecified"
+	Female      Gender = "FEMALE"
+	Male        Gender = "MALE"
+	Unspecified Gender = "UNSPECIFIED"
 )
 
 // Account represents the user's account.
 type Account struct {
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	Name           string
+	ID             uuid.UUID
+	FullName       string
+	Username       string
 	NIK            string
 	Email          string
 	Password       string
@@ -47,30 +49,32 @@ type Account struct {
 	Role           Role
 	Avatar         Avatar
 	IllnessHistory string
-	ID             uuid.UUID
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 // New creates a new Account instance.
-func New(
-	name, nik, email, password, gender, role, avatar, illnessHistory string,
-) (*Account, error) {
+func New(userName, email, password string) (*Account, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, errors.New("failed to generate account id")
 	}
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, errors.New("failed to hash account password")
+	}
+
 	account := &Account{
-		ID:             id,
-		Name:           name,
-		NIK:            nik,
-		Email:          email,
-		Password:       password,
-		Gender:         Gender(gender),
-		Role:           Role(role),
-		Avatar:         Avatar(avatar),
-		IllnessHistory: illnessHistory,
-		CreatedAt:      time.Now(),
-		UpdatedAt:      time.Now(),
+		ID:        id,
+		Username:  userName,
+		Email:     email,
+		Password:  string(hashedPassword),
+		Gender:    Unspecified,
+		Role:      Patient,
+		Avatar:    None,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	return account, nil
