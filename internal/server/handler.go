@@ -19,16 +19,14 @@ func (h *handlerError) Error() string {
 // notFound is the handler for the 404 page.
 func notFound() handlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		return &handlerError{statusCode: http.StatusNotFound, message: "route not found"}
+		return &handlerError{statusCode: http.StatusNotFound, message: "404 page not found"}
 	}
 }
 
-// index is the handler for the landing page.
-func index() handlerFunc {
-	type indexResponse struct {
-		Message string `json:"message"`
-	}
+// healthCheck is the handler for the health check route.
+func healthCheck() handlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		return sendJSONResponse(w, http.StatusOK, &indexResponse{"hello world"}, nil)
+		w.WriteHeader(http.StatusOK)
+		return nil
 	}
 }

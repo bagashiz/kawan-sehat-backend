@@ -1,8 +1,14 @@
 package server
 
-import "net/http"
+import (
+	"net/http"
 
-func addRoutes(mux *http.ServeMux) {
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
+)
+
+func addRoutes(mux *http.ServeMux, userSvc *user.Service) {
 	mux.Handle("GET /", handle(notFound()))
-	mux.Handle("GET /{$}", handle(index()))
+	mux.Handle("GET /{$}", handle(healthCheck()))
+
+	mux.Handle("POST /v1/users/register", handle(registerAccount(userSvc)))
 }

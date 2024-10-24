@@ -6,8 +6,10 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/bagashiz/kawan-sehat-backend/internal/config"
 	"github.com/bagashiz/kawan-sehat-backend/internal/postgres"
+	"github.com/bagashiz/kawan-sehat-backend/internal/postgres/repository"
 	"github.com/bagashiz/kawan-sehat-backend/internal/server"
 	"github.com/bagashiz/kawan-sehat-backend/internal/token"
 	"github.com/go-playground/validator/v10"
@@ -38,6 +40,11 @@ func run(ctx context.Context, getEnv func(string) string) error {
 		return err
 	}
 
+	tokenizer, err := token.New(cfg.Token)
+	if err != nil {
+		return err
+	}
+
 	db, err := postgres.Connect(ctx, cfg.DB.URI)
 	if err != nil {
 		return err
@@ -50,14 +57,11 @@ func run(ctx context.Context, getEnv func(string) string) error {
 		return err
 	}
 
-	_, err = token.New(cfg.Token)
-	if err != nil {
-		return err
-	}
+	postgresRepo := repository.New(db)
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	userSvc := user.NewService(postgresRepo, tokenizer, validate)
 
-	_ = validator.New(validator.WithRequiredStructEnabled())
-
-	srv := server.New(cfg.App)
+	srv := server.New(cfg.App, userSvc)
 
 	slog.Info("starting the http server", "addr", srv.Addr)
 
