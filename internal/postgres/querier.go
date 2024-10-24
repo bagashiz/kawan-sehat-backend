@@ -9,7 +9,8 @@ import (
 )
 
 type Querier interface {
-	SelectAccountByID(ctx context.Context, id int64) (Account, error)
+	InsertAccount(ctx context.Context, arg InsertAccountParams) error
+	SelectAccountByUsername(ctx context.Context, username string) (Account, error)
 }
 
 var _ Querier = (*Queries)(nil)

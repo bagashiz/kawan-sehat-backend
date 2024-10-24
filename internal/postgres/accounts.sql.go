@@ -7,21 +7,72 @@ package postgres
 
 import (
 	"context"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const selectAccountByID = `-- name: SelectAccountByID :one
-SELECT id, name, nik, email, password, gender, role, avatar, illness_history, created_at, updated_at FROM accounts
-WHERE id = $1
+const insertAccount = `-- name: InsertAccount :exec
+INSERT INTO accounts (
+    id, full_name, username,
+    nik, email, password,
+    gender, role, avatar,
+    illness_history,
+    created_at, updated_at
+) VALUES (
+  $1, $2, $3, $4, $5, $6,
+  $7, $8, $9, $10, $11, $12
+)
+`
+
+type InsertAccountParams struct {
+	ID             uuid.UUID
+	FullName       pgtype.Text
+	Username       string
+	Nik            pgtype.Text
+	Email          string
+	Password       string
+	Gender         AccountGender
+	Role           AccountRole
+	Avatar         AccountAvatar
+	IllnessHistory pgtype.Text
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+}
+
+func (q *Queries) InsertAccount(ctx context.Context, arg InsertAccountParams) error {
+	_, err := q.db.Exec(ctx, insertAccount,
+		arg.ID,
+		arg.FullName,
+		arg.Username,
+		arg.Nik,
+		arg.Email,
+		arg.Password,
+		arg.Gender,
+		arg.Role,
+		arg.Avatar,
+		arg.IllnessHistory,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+	)
+	return err
+}
+
+const selectAccountByUsername = `-- name: SelectAccountByUsername :one
+SELECT id, full_name, nik, username, email, password, gender, role, avatar, illness_history, created_at, updated_at FROM accounts
+WHERE username = $1
 LIMIT 1
 `
 
-func (q *Queries) SelectAccountByID(ctx context.Context, id int64) (Account, error) {
-	row := q.db.QueryRow(ctx, selectAccountByID, id)
+func (q *Queries) SelectAccountByUsername(ctx context.Context, username string) (Account, error) {
+	row := q.db.QueryRow(ctx, selectAccountByUsername, username)
 	var i Account
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
+		&i.FullName,
 		&i.Nik,
+		&i.Username,
 		&i.Email,
 		&i.Password,
 		&i.Gender,

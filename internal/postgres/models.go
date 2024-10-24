@@ -9,16 +9,18 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type AccountAvatar string
 
 const (
-	AccountAvatarOldFemale   AccountAvatar = "old_female"
-	AccountAvatarOldMale     AccountAvatar = "old_male"
-	AccountAvatarYoungFemale AccountAvatar = "young_female"
-	AccountAvatarYoungMale   AccountAvatar = "young_male"
+	AccountAvatarNONE        AccountAvatar = "NONE"
+	AccountAvatarOLDFEMALE   AccountAvatar = "OLD_FEMALE"
+	AccountAvatarOLDMALE     AccountAvatar = "OLD_MALE"
+	AccountAvatarYOUNGFEMALE AccountAvatar = "YOUNG_FEMALE"
+	AccountAvatarYOUNGMALE   AccountAvatar = "YOUNG_MALE"
 )
 
 func (e *AccountAvatar) Scan(src interface{}) error {
@@ -59,9 +61,9 @@ func (ns NullAccountAvatar) Value() (driver.Value, error) {
 type AccountGender string
 
 const (
-	AccountGenderFemale      AccountGender = "female"
-	AccountGenderMale        AccountGender = "male"
-	AccountGenderUnspecified AccountGender = "unspecified"
+	AccountGenderFEMALE      AccountGender = "FEMALE"
+	AccountGenderMALE        AccountGender = "MALE"
+	AccountGenderUNSPECIFIED AccountGender = "UNSPECIFIED"
 )
 
 func (e *AccountGender) Scan(src interface{}) error {
@@ -102,9 +104,9 @@ func (ns NullAccountGender) Value() (driver.Value, error) {
 type AccountRole string
 
 const (
-	AccountRolePatient AccountRole = "patient"
-	AccountRoleExpert  AccountRole = "expert"
-	AccountRoleAdmin   AccountRole = "admin"
+	AccountRolePATIENT AccountRole = "PATIENT"
+	AccountRoleEXPERT  AccountRole = "EXPERT"
+	AccountRoleADMIN   AccountRole = "ADMIN"
 )
 
 func (e *AccountRole) Scan(src interface{}) error {
@@ -143,14 +145,15 @@ func (ns NullAccountRole) Value() (driver.Value, error) {
 }
 
 type Account struct {
-	ID             int64
-	Name           string
-	Nik            string
+	ID             uuid.UUID
+	FullName       pgtype.Text
+	Nik            pgtype.Text
+	Username       string
 	Email          string
 	Password       string
 	Gender         AccountGender
 	Role           AccountRole
-	Avatar         NullAccountAvatar
+	Avatar         AccountAvatar
 	IllnessHistory pgtype.Text
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
