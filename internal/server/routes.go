@@ -10,5 +10,6 @@ func addRoutes(mux *http.ServeMux, userSvc *user.Service) {
 	mux.Handle("GET /", handle(notFound()))
 	mux.Handle("GET /{$}", handle(healthCheck()))
 
-	mux.Handle("POST /v1/users/register", handle(registerAccount(userSvc)))
+	mux.Handle("POST /v1/users/register", handle(RegisterAccount(userSvc)))
+	mux.Handle("POST /v1/users/login", handle(loginAccount(userSvc)))
 }

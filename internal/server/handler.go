@@ -1,6 +1,10 @@
 package server
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/bagashiz/kawan-sehat-backend/internal/validator"
+)
 
 // handlerFunc is a function that handles an HTTP request and returns an error.
 type handlerFunc func(http.ResponseWriter, *http.Request) error
@@ -14,6 +18,16 @@ type handlerError struct {
 // Error returns the error message for the handlerError type.
 func (h *handlerError) Error() string {
 	return h.message
+}
+
+func decodeAndValidateJSONRequest(r *http.Request, v any) error {
+	if err := decodeJSONRequest(r.Body, v); err != nil {
+		return &handlerError{message: err.Error(), statusCode: http.StatusBadRequest}
+	}
+	if err := validator.ValidateParams(v); err != nil {
+		return &handlerError{message: err.Error(), statusCode: http.StatusUnprocessableEntity}
+	}
+	return nil
 }
 
 // notFound is the handler for the 404 page.
