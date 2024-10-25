@@ -1,8 +1,9 @@
-package user
+package validator
 
 import (
 	"regexp"
 
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -26,7 +27,7 @@ func roleValidation(fl validator.FieldLevel) bool {
 
 // avatarValidation validates user avatar accounts.
 func avatarValidation(fl validator.FieldLevel) bool {
-	avatar := fl.Field().Interface().(Avatar)
+	avatar := fl.Field().Interface().(user.Avatar)
 	switch avatar {
 	case "NONE", "OLD_FEMALE", "OLD_MALE", "YOUNG_FEMALE", "YOUNG_MALE":
 		return true
@@ -37,7 +38,7 @@ func avatarValidation(fl validator.FieldLevel) bool {
 
 // genderValidation validates user role accounts.
 func genderValidation(fl validator.FieldLevel) bool {
-	gender := fl.Field().Interface().(Gender)
+	gender := fl.Field().Interface().(user.Gender)
 	switch gender {
 	case "PATIENT", "EXPERT", "ADMIN":
 		return true

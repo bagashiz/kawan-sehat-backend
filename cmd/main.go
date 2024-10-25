@@ -12,7 +12,6 @@ import (
 	"github.com/bagashiz/kawan-sehat-backend/internal/postgres/repository"
 	"github.com/bagashiz/kawan-sehat-backend/internal/server"
 	"github.com/bagashiz/kawan-sehat-backend/internal/token"
-	"github.com/go-playground/validator/v10"
 )
 
 // entry point of the application.
@@ -58,8 +57,7 @@ func run(ctx context.Context, getEnv func(string) string) error {
 	}
 
 	postgresRepo := repository.New(db)
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	userSvc := user.NewService(postgresRepo, tokenizer, validate)
+	userSvc := user.NewService(postgresRepo, tokenizer)
 
 	srv := server.New(cfg.App, userSvc)
 
