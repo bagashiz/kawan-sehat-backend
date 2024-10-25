@@ -41,7 +41,7 @@ func NewPaseto(cfg *config.Token) (*Paseto, error) {
 func (p *Paseto) CreateToken(payload *user.TokenPayload) (string, error) {
 	err := p.token.Set("payload", payload)
 	if err != nil {
-		return "", errors.New("failed to set token payload")
+		return "", user.ErrTokenCreationFail
 	}
 
 	issuedAt := time.Now()
@@ -62,12 +62,15 @@ func (pt *Paseto) VerifyToken(token string) (*user.TokenPayload, error) {
 
 	parsedToken, err := pt.parser.ParseV4Local(*pt.key, token, nil)
 	if err != nil {
-		return nil, err
+		if err.Error() == "this token has expired" {
+			return nil, user.ErrTokenExpired
+		}
+		return nil, user.ErrTokenInvalid
 	}
 
 	err = parsedToken.Get("payload", &payload)
 	if err != nil {
-		return nil, errors.New("failed to get token payload")
+		return nil, user.ErrTokenInvalid
 	}
 
 	return payload, nil

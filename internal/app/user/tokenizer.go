@@ -19,8 +19,8 @@ type TokenPayload struct {
 	UserID   uuid.UUID
 }
 
-// NewTokenPayload creates a new token payload.
-func NewTokenPayload(userID uuid.UUID, userRole Role) (*TokenPayload, error) {
+// newTokenPayload creates a new token payload.
+func newTokenPayload(userID uuid.UUID, userRole Role) (*TokenPayload, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, errors.New("failed to generate token id")

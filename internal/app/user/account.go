@@ -79,3 +79,9 @@ func New(userName, email, password string) (*Account, error) {
 
 	return account, nil
 }
+
+// ComparePassword compare the account hashed password with the given password.
+func (a *Account) ComparePassword(password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(a.Password), []byte(password))
+	return err == nil
+}
