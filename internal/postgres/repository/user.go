@@ -5,6 +5,7 @@ import (
 
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/bagashiz/kawan-sehat-backend/internal/postgres"
+	"github.com/google/uuid"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -56,9 +57,24 @@ func (r *PostgresRepository) AddAccount(ctx context.Context, account *user.Accou
 	return nil
 }
 
-// GetAccountByEmail retrieves user account data from postgres database by email.
+// GetAccountByUsername retrieves user account data from postgres database by email.
 func (r *PostgresRepository) GetAccountByUsername(ctx context.Context, username string) (*user.Account, error) {
 	result, err := r.db.SelectAccountByUsername(ctx, username)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, user.ErrAccountNotFound
+		}
+		return nil, err
+	}
+
+	account := result.ToDomain()
+
+	return account, nil
+}
+
+// GetAccountByID retrieves user account data from postgres database by email.
+func (r *PostgresRepository) GetAccountByID(ctx context.Context, id uuid.UUID) (*user.Account, error) {
+	result, err := r.db.SelectAccountByID(ctx, id)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return nil, user.ErrAccountNotFound

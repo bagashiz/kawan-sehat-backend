@@ -59,6 +59,32 @@ func (q *Queries) InsertAccount(ctx context.Context, arg InsertAccountParams) er
 	return err
 }
 
+const selectAccountByID = `-- name: SelectAccountByID :one
+SELECT id, full_name, nik, username, email, password, gender, role, avatar, illness_history, created_at, updated_at FROM accounts
+WHERE id = $1
+LIMIT 1
+`
+
+func (q *Queries) SelectAccountByID(ctx context.Context, id uuid.UUID) (Account, error) {
+	row := q.db.QueryRow(ctx, selectAccountByID, id)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.FullName,
+		&i.Nik,
+		&i.Username,
+		&i.Email,
+		&i.Password,
+		&i.Gender,
+		&i.Role,
+		&i.Avatar,
+		&i.IllnessHistory,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const selectAccountByUsername = `-- name: SelectAccountByUsername :one
 SELECT id, full_name, nik, username, email, password, gender, role, avatar, illness_history, created_at, updated_at FROM accounts
 WHERE username = $1

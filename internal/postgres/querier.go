@@ -6,10 +6,13 @@ package postgres
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
 	InsertAccount(ctx context.Context, arg InsertAccountParams) error
+	SelectAccountByID(ctx context.Context, id uuid.UUID) (Account, error)
 	SelectAccountByUsername(ctx context.Context, username string) (Account, error)
 }
 

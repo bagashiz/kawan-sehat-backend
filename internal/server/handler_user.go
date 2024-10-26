@@ -27,11 +27,6 @@ type registerRequest struct {
 	Password string `json:"password" validate:"required,min=8"`
 }
 
-// registerResponse holds the response data for the register handler.
-type registerResponse struct {
-	accountResponse
-}
-
 // RegisterAccount is the handler for the account registration route.
 func RegisterAccount(userSvc *user.Service) handlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
@@ -56,17 +51,15 @@ func RegisterAccount(userSvc *user.Service) handlerFunc {
 			}
 		}
 
-		res := &registerResponse{
-			accountResponse: accountResponse{
-				ID:        account.ID,
-				Username:  account.Username,
-				Email:     account.Email,
-				Gender:    string(account.Gender),
-				Role:      string(account.Role),
-				Avatar:    string(account.Avatar),
-				CreatedAt: account.CreatedAt,
-				UpdatedAt: account.UpdatedAt,
-			},
+		res := &accountResponse{
+			ID:        account.ID,
+			Username:  account.Username,
+			Email:     account.Email,
+			Gender:    string(account.Gender),
+			Role:      string(account.Role),
+			Avatar:    string(account.Avatar),
+			CreatedAt: account.CreatedAt,
+			UpdatedAt: account.UpdatedAt,
 		}
 
 		return sendJSONResponse(w, http.StatusCreated, res, nil)
@@ -110,7 +103,7 @@ func loginAccount(userSvc *user.Service) handlerFunc {
 			}
 		}
 
-		res := loginResponse{
+		res := &loginResponse{
 			Account: accountResponse{
 				ID:        account.ID,
 				Username:  account.Username,
@@ -122,6 +115,38 @@ func loginAccount(userSvc *user.Service) handlerFunc {
 				UpdatedAt: account.UpdatedAt,
 			},
 			Token: token,
+		}
+
+		return sendJSONResponse(w, http.StatusOK, res, nil)
+	}
+}
+
+func getAccountByID(userSvc *user.Service) handlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		id := r.PathValue("id")
+
+		account, err := userSvc.GetAccountByID(r.Context(), id)
+		if err != nil {
+			switch err {
+			case user.ErrAccountUnauthorized:
+				return &handlerError{err.Error(), http.StatusUnauthorized}
+			case user.ErrAccountForbidden:
+				return &handlerError{err.Error(), http.StatusForbidden}
+			case user.ErrAccountNotFound:
+				return &handlerError{err.Error(), http.StatusNotFound}
+			default:
+				return &handlerError{err.Error(), http.StatusBadRequest}
+			}
+		}
+		res := &accountResponse{
+			ID:        account.ID,
+			Username:  account.Username,
+			Email:     account.Email,
+			Gender:    string(account.Gender),
+			Role:      string(account.Role),
+			Avatar:    string(account.Avatar),
+			CreatedAt: account.CreatedAt,
+			UpdatedAt: account.UpdatedAt,
 		}
 
 		return sendJSONResponse(w, http.StatusOK, res, nil)

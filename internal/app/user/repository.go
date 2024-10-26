@@ -2,12 +2,14 @@ package user
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 // Reader is the interface that provides methods to read user data from the storage.
 type Reader interface {
 	GetAccountByUsername(ctx context.Context, username string) (*Account, error)
-	// GetAccountByEmail(ctx context.Context, email string) (*Account, error)
+	GetAccountByID(ctx context.Context, id uuid.UUID) (*Account, error)
 	// ListAccounts(ctx context.Context, limit, offset int) ([]*Account, error)
 }
 
