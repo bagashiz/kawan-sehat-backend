@@ -1,9 +1,13 @@
 package server
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
+
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 )
 
 // responseWriter extends the http.ResponseWriter type to store the status code.
@@ -75,5 +79,28 @@ func logRequest(r *http.Request, statusCode int, duration time.Duration, errMsg 
 			slog.String("url", r.URL.Path),
 			slog.Duration("duration", duration),
 		)
+	}
+}
+
+func auth(h handlerFunc, tokenizer user.Tokenizer) handlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		authHeader := r.Header.Get(user.AuthHeaderKey)
+		if authHeader == "" {
+			return &handlerError{"missing authorization header", http.StatusUnauthorized}
+		}
+
+		fields := strings.Fields(authHeader)
+		if len(fields) != 2 || fields[0] != user.AuthType {
+			return &handlerError{"invalid authorization header", http.StatusUnauthorized}
+		}
+
+		token := fields[1]
+		payload, err := tokenizer.VerifyToken(token)
+		if err != nil {
+			return &handlerError{err.Error(), http.StatusUnauthorized}
+		}
+
+		ctx := context.WithValue(r.Context(), user.AuthPayloadKey, payload)
+		return h(w, r.WithContext(ctx))
 	}
 }
