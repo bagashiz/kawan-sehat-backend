@@ -18,14 +18,12 @@ type Server struct {
 
 // New creates a new http.Server type, configures the routes, and adds middleware.
 func New(cfg *config.App, userSvc *user.Service) *Server {
-	mux := http.NewServeMux()
 	addr := net.JoinHostPort(cfg.Host, cfg.Port)
-
-	addRoutes(mux, userSvc)
+	router := registerRoutes(userSvc)
 
 	server := &http.Server{
 		Addr:    addr,
-		Handler: mux,
+		Handler: router,
 	}
 
 	return &Server{server}

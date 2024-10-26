@@ -1,4 +1,4 @@
-package server
+package handler
 
 import (
 	"net/http"
@@ -28,7 +28,7 @@ type registerRequest struct {
 }
 
 // RegisterAccount is the handler for the account registration route.
-func RegisterAccount(userSvc *user.Service) handlerFunc {
+func RegisterAccount(userSvc *user.Service) APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var req registerRequest
 		if err := decodeAndValidateJSONRequest(r, &req); err != nil {
@@ -43,12 +43,7 @@ func RegisterAccount(userSvc *user.Service) handlerFunc {
 				Password: req.Password,
 			})
 		if err != nil {
-			switch err {
-			case user.ErrAccountDuplicateEmail, user.ErrAccountDuplicateUsername:
-				return &handlerError{err.Error(), http.StatusConflict}
-			default:
-				return &handlerError{err.Error(), http.StatusBadRequest}
-			}
+			handleUserError(err)
 		}
 
 		res := &accountResponse{
@@ -62,7 +57,7 @@ func RegisterAccount(userSvc *user.Service) handlerFunc {
 			UpdatedAt: account.UpdatedAt,
 		}
 
-		return sendJSONResponse(w, http.StatusCreated, res, nil)
+		return writeJSON(w, http.StatusCreated, res, nil)
 	}
 }
 
@@ -78,8 +73,8 @@ type loginResponse struct {
 	Token   string          `json:"token"`
 }
 
-// loginAccount is the handler for the account login route.
-func loginAccount(userSvc *user.Service) handlerFunc {
+// LoginAccount is the handler for the account login route.
+func LoginAccount(userSvc *user.Service) APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var req loginRequest
 		if err := decodeAndValidateJSONRequest(r, &req); err != nil {
@@ -93,14 +88,7 @@ func loginAccount(userSvc *user.Service) handlerFunc {
 				Password: req.Password,
 			})
 		if err != nil {
-			switch err {
-			case user.ErrAccountNotFound:
-				return &handlerError{err.Error(), http.StatusNotFound}
-			case user.ErrAccountUnauthorized:
-				return &handlerError{err.Error(), http.StatusUnauthorized}
-			default:
-				return &handlerError{err.Error(), http.StatusBadRequest}
-			}
+			handleUserError(err)
 		}
 
 		res := &loginResponse{
@@ -117,26 +105,18 @@ func loginAccount(userSvc *user.Service) handlerFunc {
 			Token: token,
 		}
 
-		return sendJSONResponse(w, http.StatusOK, res, nil)
+		return writeJSON(w, http.StatusOK, res, nil)
 	}
 }
 
-func getAccountByID(userSvc *user.Service) handlerFunc {
+// GetAccountByID is the handler for the account retrieval by ID route.
+func GetAccountByID(userSvc *user.Service) APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id := r.PathValue("id")
 
 		account, err := userSvc.GetAccountByID(r.Context(), id)
 		if err != nil {
-			switch err {
-			case user.ErrAccountUnauthorized:
-				return &handlerError{err.Error(), http.StatusUnauthorized}
-			case user.ErrAccountForbidden:
-				return &handlerError{err.Error(), http.StatusForbidden}
-			case user.ErrAccountNotFound:
-				return &handlerError{err.Error(), http.StatusNotFound}
-			default:
-				return &handlerError{err.Error(), http.StatusBadRequest}
-			}
+			handleUserError(err)
 		}
 		res := &accountResponse{
 			ID:        account.ID,
@@ -149,6 +129,22 @@ func getAccountByID(userSvc *user.Service) handlerFunc {
 			UpdatedAt: account.UpdatedAt,
 		}
 
-		return sendJSONResponse(w, http.StatusOK, res, nil)
+		return writeJSON(w, http.StatusOK, res, nil)
+	}
+}
+
+// handleUserError determines the appropriate HTTP status code for the user service error.
+func handleUserError(err error) APIError {
+	switch err {
+	case user.ErrAccountNotFound:
+		return NotFoundRequest(err)
+	case user.ErrAccountUnauthorized:
+		return UnauthorizedRequest(err)
+	case user.ErrAccountForbidden:
+		return ForbiddenRequest(err)
+	case user.ErrAccountDuplicateEmail, user.ErrAccountDuplicateUsername:
+		return ConflictRequest(err)
+	default:
+		return BadRequest(err)
 	}
 }

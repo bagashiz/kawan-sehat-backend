@@ -4,14 +4,31 @@ import (
 	"net/http"
 
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
+	"github.com/bagashiz/kawan-sehat-backend/internal/server/handler"
+	"github.com/go-chi/chi/v5"
 )
 
-// addRoutes configures the routes for the application.
-func addRoutes(mux *http.ServeMux, userSvc *user.Service) {
-	mux.Handle("GET /", handle(notFound()))
-	mux.Handle("GET /{$}", handle(healthCheck()))
+// registerRoutes configures the routes for the application.
+func registerRoutes(userSvc *user.Service) *chi.Mux {
+	mux := chi.NewRouter()
 
-	mux.Handle("POST /v1/users/register", handle(RegisterAccount(userSvc)))
-	mux.Handle("POST /v1/users/login", handle(loginAccount(userSvc)))
-	mux.Handle("GET /v1/users/{id}", handle(getAccountByID(userSvc)))
+	mux.Route("/users", func(r chi.Router) {
+		mux.Post("/register", handle(handler.RegisterAccount(userSvc)))
+		mux.Post("/login", handle(handler.LoginAccount(userSvc)))
+		mux.Get("/{id}", handle(handler.GetAccountByID(userSvc)))
+	})
+
+	mux.Route("/v1", func(r chi.Router) {
+		r.Mount("/users", mux)
+	})
+
+	mux.Get("/", handle(handler.NotFound()))
+	mux.Get("/healthz", handle(handler.HealthCheck()))
+
+	return mux
+}
+
+// handle wraps the handler.Handle function to shorten the function signature.
+func handle(h handler.APIFunc) http.HandlerFunc {
+	return handler.Handle(h)
 }

@@ -1,14 +1,13 @@
-package server
+package handler
 
 import (
-	"context"
 	"log/slog"
 	"net/http"
-	"strings"
 	"time"
-
-	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 )
+
+// APIFunc is a function that handles an HTTP request and returns an error.
+type APIFunc func(http.ResponseWriter, *http.Request) error
 
 // responseWriter extends the http.ResponseWriter type to store the status code.
 type responseWriter struct {
@@ -22,9 +21,9 @@ func (w *responseWriter) WriteHeader(statusCode int) {
 	w.ResponseWriter.WriteHeader(statusCode)
 }
 
-// handle wraps a handlerFunc type as an http.Handler, switch to custom ResponseWriter,
-// handles errors, and logs request information.
-func handle(h handlerFunc) http.Handler {
+// Handle wraps custom APIFunc type as an http.HandlerFunc,
+// switch to custom ResponseWriter, handles errors, and logs request information.
+func Handle(h APIFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
@@ -37,12 +36,12 @@ func handle(h handlerFunc) http.Handler {
 			statusCode := http.StatusInternalServerError
 			errMsg := http.StatusText(statusCode)
 
-			if handlerErr, ok := err.(*handlerError); ok {
-				statusCode = handlerErr.statusCode
-				errMsg = handlerErr.Error()
+			if apiErr, ok := err.(APIError); ok {
+				statusCode = apiErr.StatusCode
+				errMsg = apiErr.Error()
 			}
 
-			if encodeErr := sendJSONResponse(writer, statusCode, nil, err); encodeErr != nil {
+			if encodeErr := writeJSON(writer, statusCode, nil, err); encodeErr != nil {
 				http.Error(writer, errMsg, http.StatusInternalServerError)
 			}
 
@@ -79,28 +78,5 @@ func logRequest(r *http.Request, statusCode int, duration time.Duration, errMsg 
 			slog.String("url", r.URL.Path),
 			slog.Duration("duration", duration),
 		)
-	}
-}
-
-func auth(h handlerFunc, tokenizer user.Tokenizer) handlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) error {
-		authHeader := r.Header.Get(user.AuthHeaderKey)
-		if authHeader == "" {
-			return &handlerError{"missing authorization header", http.StatusUnauthorized}
-		}
-
-		fields := strings.Fields(authHeader)
-		if len(fields) != 2 || fields[0] != user.AuthType {
-			return &handlerError{"invalid authorization header", http.StatusUnauthorized}
-		}
-
-		token := fields[1]
-		payload, err := tokenizer.VerifyToken(token)
-		if err != nil {
-			return &handlerError{err.Error(), http.StatusUnauthorized}
-		}
-
-		ctx := context.WithValue(r.Context(), user.AuthPayloadKey, payload)
-		return h(w, r.WithContext(ctx))
 	}
 }

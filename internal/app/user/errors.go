@@ -6,20 +6,23 @@ type UserError struct {
 }
 
 // Error returns the error message for the UserError type.
-func (ue *UserError) Error() string {
+func (ue UserError) Error() string {
 	return ue.message
 }
 
 var (
 	// list of errors for authentication and authorization
-	ErrAccountUnauthorized = &UserError{"email or password is incorrect"}
+	ErrAuthHeaderMissing   = UserError{"missing authorization header"}
+	ErrAuthHeaderInvalid   = UserError{"invalid authorization header"}
+	ErrAccountUnauthorized = UserError{"email or password is incorrect"}
+	ErrAccountForbidden    = UserError{"account is forbidden to access the resource"}
 	// list of errors for token provider
-	ErrTokenCreationFail = &UserError{"failed to create token"}
-	ErrTokenExpired      = &UserError{"token has expired"}
-	ErrTokenInvalid      = &UserError{"invalid token"}
+	ErrTokenCreationFail = UserError{"failed to create token"}
+	ErrTokenExpired      = UserError{"token has expired"}
+	ErrTokenInvalid      = UserError{"invalid token"}
 	// list of errors for user repository
-	ErrAccountInvalid           = &UserError{"account data is invalid"}
-	ErrAccountDuplicateEmail    = &UserError{"account with this email already exists"}
-	ErrAccountDuplicateUsername = &UserError{"account with this username already exists"}
-	ErrAccountNotFound          = &UserError{"account not found"}
+	ErrAccountInvalid           = UserError{"account data is invalid"}
+	ErrAccountDuplicateEmail    = UserError{"account with this email already exists"}
+	ErrAccountDuplicateUsername = UserError{"account with this username already exists"}
+	ErrAccountNotFound          = UserError{"account not found"}
 )

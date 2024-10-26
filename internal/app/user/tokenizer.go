@@ -1,9 +1,19 @@
 package user
 
 import (
+	"context"
 	"errors"
 
 	"github.com/google/uuid"
+)
+
+const (
+	// authHeaderKey is the key used to extract the token from the request header.
+	AuthHeaderKey = "Authorization"
+	// authType is the type of authentication used in the header.
+	AuthType = "Bearer"
+	// authPayloadKey is the key used to store the token payload in the request context.
+	AuthPayloadKey = "token-payload"
 )
 
 // Tokenizer is the interface for interacting with token providers.
@@ -30,4 +40,13 @@ func newTokenPayload(userID uuid.UUID, userRole Role) (*TokenPayload, error) {
 		UserID:   userID,
 		UserRole: userRole,
 	}, nil
+}
+
+// getTokenPayload extracts the token payload from the context.
+func getTokenPayload(ctx context.Context) (*TokenPayload, error) {
+	payload, ok := ctx.Value(AuthPayloadKey).(*TokenPayload)
+	if !ok {
+		return nil, ErrAccountUnauthorized
+	}
+	return payload, nil
 }
