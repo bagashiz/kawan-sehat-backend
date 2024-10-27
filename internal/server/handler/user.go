@@ -42,7 +42,7 @@ func (h *Handler) RegisterAccount() APIFunc {
 				Password: req.Password,
 			})
 		if err != nil {
-			handleUserError(err)
+			return handleUserError(err)
 		}
 
 		res := &accountResponse{
@@ -87,7 +87,7 @@ func (h *Handler) LoginAccount() APIFunc {
 				Password: req.Password,
 			})
 		if err != nil {
-			handleUserError(err)
+			return handleUserError(err)
 		}
 
 		res := &loginResponse{
@@ -115,7 +115,7 @@ func (h *Handler) GetAccountByID() APIFunc {
 
 		account, err := h.userSvc.GetAccountByID(r.Context(), id)
 		if err != nil {
-			handleUserError(err)
+			return handleUserError(err)
 		}
 		res := &accountResponse{
 			ID:        account.ID.String(),
