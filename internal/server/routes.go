@@ -3,54 +3,49 @@ package server
 import (
 	"net/http"
 
-	"github.com/bagashiz/kawan-sehat-backend/internal/app/topic"
-	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/bagashiz/kawan-sehat-backend/internal/server/handler"
 	"github.com/bagashiz/kawan-sehat-backend/internal/server/middleware"
 	"github.com/go-chi/chi/v5"
 )
 
 // registerRoutes configures the routes for the application.
-func registerRoutes(t user.Tokenizer, userSvc *user.Service, topicSvc *topic.Service) *chi.Mux {
+func registerRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 	mux := chi.NewRouter()
-	userRouter := userRoutes(userSvc)
-	topicRouter := topicRoutes(t, topicSvc)
+	userRouter := userRoutes(h)
+	topicRouter := topicRoutes(h, m)
 
 	mux.Route("/v1", func(r chi.Router) {
 		r.Mount("/users", userRouter)
 		r.Mount("/topics", topicRouter)
 	})
 
-	mux.Get("/", handle(handler.NotFound()))
-	mux.Get("/healthz", handle(handler.HealthCheck()))
+	mux.Get("/", handle(h.NotFound()))
+	mux.Get("/healthz", handle(h.HealthCheck()))
 
 	return mux
 }
 
-func userRoutes(userSvc *user.Service) *chi.Mux {
+// userRoutes configures the routes for the user service.
+func userRoutes(h *handler.Handler) *chi.Mux {
 	mux := chi.NewRouter()
 	mux.Route("/users", func(r chi.Router) {
-		mux.Post("/register", handle(handler.RegisterAccount(userSvc)))
-		mux.Post("/login", handle(handler.LoginAccount(userSvc)))
-		mux.Get("/{id}", handle(handler.GetAccountByID(userSvc)))
+		mux.Post("/register", handle(h.RegisterAccount()))
+		mux.Post("/login", handle(h.LoginAccount()))
+		mux.Get("/{id}", handle(h.GetAccountByID()))
 	})
 	return mux
 }
 
-func topicRoutes(t user.Tokenizer, topicSvc *topic.Service) *chi.Mux {
+// topicRoutes configures the routes for the topic service.
+func topicRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
+	admin := m.Chain(m.Auth, m.Admin)
 	mux := chi.NewRouter()
 	mux.Route("/topics", func(r chi.Router) {
-		mux.Post("/",
-			handle(auth(admin(handler.CreateTopic(topicSvc)), t)),
-		)
-		mux.Put("/{id}",
-			handle(auth(admin(handler.UpdateTopic(topicSvc)), t)),
-		)
-		mux.Delete("/{id}",
-			handle(auth(admin(handler.DeleteTopic(topicSvc)), t)),
-		)
-		mux.Get("/{id}", handle(handler.GetTopicByID(topicSvc)))
-		mux.Get("/", handle(handler.ListTopics(topicSvc)))
+		mux.Post("/", handle(admin(h.CreateTopic())))
+		mux.Put("/{id}", handle(admin(h.UpdateTopic())))
+		mux.Delete("/{id}", handle(admin(h.DeleteTopic())))
+		mux.Get("/{id}", handle(h.GetTopicByID()))
+		mux.Get("/", handle(h.ListTopics()))
 	})
 	return mux
 }
@@ -58,14 +53,4 @@ func topicRoutes(t user.Tokenizer, topicSvc *topic.Service) *chi.Mux {
 // handle wraps the handler.Handle function to shorten the function signature.
 func handle(h handler.APIFunc) http.HandlerFunc {
 	return handler.Handle(h)
-}
-
-// admin wraps the middleware.Admih function to shorten the function signature.
-func admin(h handler.APIFunc) handler.APIFunc {
-	return middleware.Admin(h)
-}
-
-// auth wraps the middleware.Admih function to shorten the function signature.
-func auth(h handler.APIFunc, t user.Tokenizer) handler.APIFunc {
-	return middleware.Auth(h, t)
 }

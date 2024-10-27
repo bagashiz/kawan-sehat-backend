@@ -27,14 +27,14 @@ type registerRequest struct {
 }
 
 // RegisterAccount is the handler for the account registration route.
-func RegisterAccount(userSvc *user.Service) APIFunc {
+func (h *Handler) RegisterAccount() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var req registerRequest
-		if err := decodeAndValidateJSONRequest(r, &req); err != nil {
+		if err := h.decodeAndValidateJSONRequest(r, &req); err != nil {
 			return err
 		}
 
-		account, err := userSvc.RegisterAccount(
+		account, err := h.userSvc.RegisterAccount(
 			r.Context(),
 			user.RegisterAccountParams{
 				Username: req.Username,
@@ -73,14 +73,14 @@ type loginResponse struct {
 }
 
 // LoginAccount is the handler for the account login route.
-func LoginAccount(userSvc *user.Service) APIFunc {
+func (h *Handler) LoginAccount() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var req loginRequest
-		if err := decodeAndValidateJSONRequest(r, &req); err != nil {
+		if err := h.decodeAndValidateJSONRequest(r, &req); err != nil {
 			return err
 		}
 
-		account, token, err := userSvc.LoginAccount(
+		account, token, err := h.userSvc.LoginAccount(
 			r.Context(),
 			user.LoginAccountParams{
 				Username: req.Username,
@@ -109,11 +109,11 @@ func LoginAccount(userSvc *user.Service) APIFunc {
 }
 
 // GetAccountByID is the handler for the account retrieval by ID route.
-func GetAccountByID(userSvc *user.Service) APIFunc {
+func (h *Handler) GetAccountByID() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id := r.PathValue("id")
 
-		account, err := userSvc.GetAccountByID(r.Context(), id)
+		account, err := h.userSvc.GetAccountByID(r.Context(), id)
 		if err != nil {
 			handleUserError(err)
 		}

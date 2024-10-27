@@ -12,7 +12,10 @@ import (
 	"github.com/bagashiz/kawan-sehat-backend/internal/postgres"
 	"github.com/bagashiz/kawan-sehat-backend/internal/postgres/repository"
 	"github.com/bagashiz/kawan-sehat-backend/internal/server"
+	"github.com/bagashiz/kawan-sehat-backend/internal/server/handler"
+	"github.com/bagashiz/kawan-sehat-backend/internal/server/middleware"
 	"github.com/bagashiz/kawan-sehat-backend/internal/token"
+	"github.com/bagashiz/kawan-sehat-backend/internal/validator"
 )
 
 // entry point of the application.
@@ -57,11 +60,14 @@ func run(ctx context.Context, getEnv func(string) string) error {
 		return err
 	}
 
+	validator := validator.New()
 	postgresRepo := repository.New(db)
 	userSvc := user.NewService(postgresRepo, tokenizer)
 	topicSvc := topic.NewService(postgresRepo)
 
-	srv := server.New(cfg.App, tokenizer, userSvc, topicSvc)
+	h := handler.New(validator, userSvc, topicSvc)
+	m := middleware.New(tokenizer)
+	srv := server.New(cfg.App, h, m)
 
 	slog.Info("starting the http server", "addr", srv.Addr)
 

@@ -4,7 +4,31 @@ import (
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/topic"
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
+	"github.com/bagashiz/kawan-sehat-backend/internal/validator"
 )
+
+// Handler holds dependencies for handling HTTP requests.
+type Handler struct {
+	validator *validator.Validator
+	userSvc   *user.Service
+	topicSvc  *topic.Service
+}
+
+// New creates a new Handler instance.
+func New(
+	validator *validator.Validator,
+	userSvc *user.Service,
+	topicSvc *topic.Service,
+) *Handler {
+	return &Handler{
+		validator: validator,
+		userSvc:   userSvc,
+		topicSvc:  topicSvc,
+	}
+}
 
 // APIFunc is a function that handles an HTTP request and returns an error.
 type APIFunc func(http.ResponseWriter, *http.Request) error

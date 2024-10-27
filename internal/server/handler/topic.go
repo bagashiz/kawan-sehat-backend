@@ -24,14 +24,14 @@ type createTopicRequest struct {
 }
 
 // CreateTopic is the handler for the topic creation route.
-func CreateTopic(topicSvc *topic.Service) APIFunc {
+func (h *Handler) CreateTopic() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var req createTopicRequest
-		if err := decodeAndValidateJSONRequest(r, &req); err != nil {
+		if err := h.decodeAndValidateJSONRequest(r, &req); err != nil {
 			return err
 		}
 
-		topic, err := topicSvc.AddTopic(
+		topic, err := h.topicSvc.AddTopic(
 			r.Context(),
 			topic.CreateTopicParams{
 				Name:        req.Name,
@@ -60,16 +60,16 @@ type updateTopicRequest struct {
 }
 
 // UpdateTopic is the handler for the topic update route.
-func UpdateTopic(topicSvc *topic.Service) APIFunc {
+func (h *Handler) UpdateTopic() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var req updateTopicRequest
-		if err := decodeAndValidateJSONRequest(r, &req); err != nil {
+		if err := h.decodeAndValidateJSONRequest(r, &req); err != nil {
 			return err
 		}
 
 		id := r.PathValue("id")
 
-		topic, err := topicSvc.UpdateTopic(
+		topic, err := h.topicSvc.UpdateTopic(
 			r.Context(),
 			topic.UpdateTopicParams{
 				ID:          id,
@@ -94,11 +94,11 @@ func UpdateTopic(topicSvc *topic.Service) APIFunc {
 }
 
 // DeleteTopic is the handler for the topic deletion route.
-func DeleteTopic(topicSvc *topic.Service) APIFunc {
+func (h *Handler) DeleteTopic() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id := r.PathValue("id")
 
-		err := topicSvc.DeleteTopic(r.Context(), id)
+		err := h.topicSvc.DeleteTopic(r.Context(), id)
 		if err != nil {
 			return handleTopicError(err)
 		}
@@ -108,11 +108,11 @@ func DeleteTopic(topicSvc *topic.Service) APIFunc {
 }
 
 // GetTopicByID is the handler for the topic retrieval route.
-func GetTopicByID(topicSvc *topic.Service) APIFunc {
+func (h *Handler) GetTopicByID() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id := r.PathValue("id")
 
-		topic, err := topicSvc.GetTopicByID(r.Context(), id)
+		topic, err := h.topicSvc.GetTopicByID(r.Context(), id)
 		if err != nil {
 			return handleTopicError(err)
 		}
@@ -138,7 +138,7 @@ type listTopicsResponse struct {
 }
 
 // ListTopics is the handler for the topic list route.
-func ListTopics(topicSvc *topic.Service) APIFunc {
+func (h *Handler) ListTopics() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		limit := r.URL.Query().Get("limit")
 		offset := r.URL.Query().Get("offset")
@@ -153,7 +153,7 @@ func ListTopics(topicSvc *topic.Service) APIFunc {
 			return BadRequest(err)
 		}
 
-		topics, err := topicSvc.ListTopics(r.Context(), limit32, offset32)
+		topics, err := h.topicSvc.ListTopics(r.Context(), limit32, offset32)
 		if err != nil {
 			return handleTopicError(err)
 		}

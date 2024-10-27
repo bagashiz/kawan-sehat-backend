@@ -6,16 +6,14 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-
-	"github.com/bagashiz/kawan-sehat-backend/internal/validator"
 )
 
 // decodeAndValidateJSONRequest decodes a JSON request body into the given struct and validates it.
-func decodeAndValidateJSONRequest(r *http.Request, v any) error {
+func (h *Handler) decodeAndValidateJSONRequest(r *http.Request, v any) error {
 	if err := decodeJSONRequest(r.Body, v); err != nil {
 		return BadRequest(err)
 	}
-	if err := validator.ValidateParams(v); err != nil {
+	if err := h.validator.ValidateParams(v); err != nil {
 		return UnprocessableRequest(err)
 	}
 	return nil

@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bagashiz/kawan-sehat-backend/internal/app/topic"
-	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/bagashiz/kawan-sehat-backend/internal/config"
+	"github.com/bagashiz/kawan-sehat-backend/internal/server/handler"
+	"github.com/bagashiz/kawan-sehat-backend/internal/server/middleware"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -20,12 +20,11 @@ type Server struct {
 // New creates a new http.Server type, configures the routes, and adds middleware.
 func New(
 	cfg *config.App,
-	tokenizer user.Tokenizer,
-	userSvc *user.Service,
-	topicSvc *topic.Service,
+	h *handler.Handler,
+	m *middleware.Middleware,
 ) *Server {
 	addr := net.JoinHostPort(cfg.Host, cfg.Port)
-	router := registerRoutes(tokenizer, userSvc, topicSvc)
+	router := registerRoutes(h, m)
 
 	server := &http.Server{
 		Addr:    addr,
@@ -50,7 +49,9 @@ func (s *Server) Start(ctx context.Context) error {
 	errs.Go(func() error {
 		<-ctx.Done()
 
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		shutdownCtx, cancel := context.WithTimeout(
+			context.Background(), 10*time.Second,
+		)
 		defer cancel()
 
 		if err := s.Shutdown(shutdownCtx); err != nil {

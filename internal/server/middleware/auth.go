@@ -11,7 +11,7 @@ import (
 
 // Auth is a middleware that checks if the request has a valid authorization header and verify if the token is valid.
 // If the token is valid, the payload is added to the request context.
-func Auth(h handler.APIFunc, tokenizer user.Tokenizer) handler.APIFunc {
+func (m *Middleware) Auth(h handler.APIFunc) handler.APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		authHeader := r.Header.Get(user.AuthHeaderKey)
 		if authHeader == "" {
@@ -24,7 +24,7 @@ func Auth(h handler.APIFunc, tokenizer user.Tokenizer) handler.APIFunc {
 		}
 
 		token := fields[1]
-		payload, err := tokenizer.VerifyToken(token)
+		payload, err := m.tokenizer.VerifyToken(token)
 		if err != nil {
 			return handler.UnauthorizedRequest(err)
 		}

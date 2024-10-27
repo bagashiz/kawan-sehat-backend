@@ -7,10 +7,16 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-// validate is a singleton instance of the validator v10 for validation.
-var validate = validator.New(validator.WithRequiredStructEnabled())
+// Validator is a struct that holds the validator instance
+// to validate struct fields.
+type Validator struct {
+	validate *validator.Validate
+}
 
-func init() {
+// New creates a new Validator instance and registers custom validations.
+func New() *Validator {
+	v := validator.New(validator.WithRequiredStructEnabled())
+
 	customValidations := map[string]validator.Func{
 		"username": usernameValidation,
 		"role":     roleValidation,
@@ -20,14 +26,16 @@ func init() {
 	}
 
 	for tag, fn := range customValidations {
-		validate.RegisterValidation(tag, fn)
+		v.RegisterValidation(tag, fn)
 	}
+
+	return &Validator{validate: v}
 }
 
-// ValidateParams validates and compiles each validation errors into a single error message.
-// each validation  errors separated by new line.
-func ValidateParams(params any) error {
-	if err := validate.Struct(params); err != nil {
+// ValidateParams validates and compiles each validation error into a single error message.
+// Each validation error is separated by a new line.
+func (v *Validator) ValidateParams(params any) error {
+	if err := v.validate.Struct(params); err != nil {
 		if validationErrs, ok := err.(validator.ValidationErrors); ok {
 			var errorMsgs []string
 			for _, e := range validationErrs {

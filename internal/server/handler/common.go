@@ -6,7 +6,7 @@ import (
 )
 
 // NotFound is the handler for the 404 page.
-func NotFound() APIFunc {
+func (h *Handler) NotFound() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		err := errors.New("404 page not found")
 		return NotFoundRequest(err)
@@ -14,7 +14,7 @@ func NotFound() APIFunc {
 }
 
 // HealthCheck is the handler for the health check route.
-func HealthCheck() APIFunc {
+func (h *Handler) HealthCheck() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		w.WriteHeader(http.StatusOK)
 		return nil

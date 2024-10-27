@@ -8,7 +8,7 @@ import (
 )
 
 // Admin is a middleware that checks if the current request is made by a user with admin role.
-func Admin(h handler.APIFunc) handler.APIFunc {
+func (m *Middleware) Admin(h handler.APIFunc) handler.APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		payload, err := user.GetTokenPayload(r.Context())
 		if err != nil {
@@ -18,6 +18,7 @@ func Admin(h handler.APIFunc) handler.APIFunc {
 		if payload.UserRole != user.Admin {
 			return handler.ForbiddenRequest(user.ErrAccountForbidden)
 		}
+
 		return h(w, r)
 	}
 }
