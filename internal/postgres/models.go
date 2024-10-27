@@ -158,3 +158,12 @@ type Account struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }
+
+type Topic struct {
+	ID          uuid.UUID
+	Name        string
+	Slug        string
+	Description string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}

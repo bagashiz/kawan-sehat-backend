@@ -1,6 +1,9 @@
 package postgres
 
-import "github.com/bagashiz/kawan-sehat-backend/internal/app/user"
+import (
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/topic"
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
+)
 
 // ToDomain converts generated Account struct to domain account struct
 func (a Account) ToDomain() *user.Account {
@@ -17,5 +20,17 @@ func (a Account) ToDomain() *user.Account {
 		IllnessHistory: a.IllnessHistory.String,
 		CreatedAt:      a.CreatedAt,
 		UpdatedAt:      a.UpdatedAt,
+	}
+}
+
+// ToDomain converts generated Topic struct to domain account struct
+func (t Topic) ToDomain() *topic.Topic {
+	return &topic.Topic{
+		ID:          t.ID,
+		Name:        t.Name,
+		Slug:        t.Slug,
+		Description: t.Description,
+		CreatedAt:   t.CreatedAt,
+		UpdatedAt:   t.UpdatedAt,
 	}
 }

@@ -57,7 +57,7 @@ func (r *PostgresRepository) AddAccount(ctx context.Context, account *user.Accou
 	return nil
 }
 
-// GetAccountByUsername retrieves user account data from postgres database by email.
+// GetAccountByUsername retrieves user account data from postgres database by username.
 func (r *PostgresRepository) GetAccountByUsername(ctx context.Context, username string) (*user.Account, error) {
 	result, err := r.db.SelectAccountByUsername(ctx, username)
 	if err != nil {
@@ -72,7 +72,7 @@ func (r *PostgresRepository) GetAccountByUsername(ctx context.Context, username 
 	return account, nil
 }
 
-// GetAccountByID retrieves user account data from postgres database by email.
+// GetAccountByID retrieves user account data from postgres database by ID.
 func (r *PostgresRepository) GetAccountByID(ctx context.Context, id uuid.UUID) (*user.Account, error) {
 	result, err := r.db.SelectAccountByID(ctx, id)
 	if err != nil {
