@@ -8,7 +8,7 @@ type APIError struct {
 	StatusCode int
 }
 
-// Error returns the error message for the handlerError type.
+// Error returns the error message for the APIError type.
 func (h APIError) Error() string {
 	return h.Message
 }

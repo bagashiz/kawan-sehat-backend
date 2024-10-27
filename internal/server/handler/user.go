@@ -5,12 +5,11 @@ import (
 	"time"
 
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
-	"github.com/google/uuid"
 )
 
 // accountResponse holds the response data for the account object.
 type accountResponse struct {
-	ID        uuid.UUID `json:"id"`
+	ID        string    `json:"id"`
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`
 	Gender    string    `json:"gender"`
@@ -47,7 +46,7 @@ func RegisterAccount(userSvc *user.Service) APIFunc {
 		}
 
 		res := &accountResponse{
-			ID:        account.ID,
+			ID:        account.ID.String(),
 			Username:  account.Username,
 			Email:     account.Email,
 			Gender:    string(account.Gender),
@@ -93,7 +92,7 @@ func LoginAccount(userSvc *user.Service) APIFunc {
 
 		res := &loginResponse{
 			Account: accountResponse{
-				ID:        account.ID,
+				ID:        account.ID.String(),
 				Username:  account.Username,
 				Email:     account.Email,
 				Gender:    string(account.Gender),
@@ -119,7 +118,7 @@ func GetAccountByID(userSvc *user.Service) APIFunc {
 			handleUserError(err)
 		}
 		res := &accountResponse{
-			ID:        account.ID,
+			ID:        account.ID.String(),
 			Username:  account.Username,
 			Email:     account.Email,
 			Gender:    string(account.Gender),
@@ -136,14 +135,16 @@ func GetAccountByID(userSvc *user.Service) APIFunc {
 // handleUserError determines the appropriate HTTP status code for the user service error.
 func handleUserError(err error) APIError {
 	switch err {
-	case user.ErrAccountNotFound:
-		return NotFoundRequest(err)
 	case user.ErrAccountUnauthorized:
 		return UnauthorizedRequest(err)
 	case user.ErrAccountForbidden:
 		return ForbiddenRequest(err)
+	case user.ErrAccountNotFound:
+		return NotFoundRequest(err)
 	case user.ErrAccountDuplicateEmail, user.ErrAccountDuplicateUsername:
 		return ConflictRequest(err)
+	case user.ErrAccountInvalid:
+		return UnprocessableRequest(err)
 	default:
 		return BadRequest(err)
 	}
