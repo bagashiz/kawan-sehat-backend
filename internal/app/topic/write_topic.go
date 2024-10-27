@@ -62,3 +62,21 @@ func (s *Service) DeleteTopic(ctx context.Context, id string) error {
 	}
 	return s.repo.DeleteTopic(ctx, uuid)
 }
+
+// FollowTopic adds a topic to the account's followed topics.
+func (s *Service) FollowTopic(ctx context.Context, topicID string) error {
+	accountTopic, err := createAccountTopic(ctx, topicID)
+	if err != nil {
+		return err
+	}
+	return s.repo.RelateAccountToTopic(ctx, accountTopic)
+}
+
+// UnfollowTopic removes a topic from the account's followed topics.
+func (s *Service) UnfollowTopic(ctx context.Context, topicID string) error {
+	accountTopic, err := createAccountTopic(ctx, topicID)
+	if err != nil {
+		return err
+	}
+	return s.repo.UnrelateAccountFromTopic(ctx, accountTopic)
+}
