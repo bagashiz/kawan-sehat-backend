@@ -1,0 +1,27 @@
+linters:
+  fast: true
+  enable:
+    - asciicheck
+    - bodyclose
+    - canonicalheader
+    - dupl
+    - dupword
+    - funlen
+    - gci
+    - gochecknoglobals
+    - gochecknoinits
+    - goconst
+    - godot
+    - godox
+    - inamedparam
+    - interfacebloat
+    - intrange
+    - lll
+    - nestif
+    - nilerr
+    - nilnil
+
+linters-settings:
+  govet:
+    disable:
+      - fieldalignment
