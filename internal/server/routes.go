@@ -33,6 +33,7 @@ func userRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 	mux.Route("/users", func(r chi.Router) {
 		mux.Post("/register", handle(h.RegisterAccount()))
 		mux.Post("/login", handle(h.LoginAccount()))
+		mux.Put("/", handle(auth(h.UpdateAccount())))
 		mux.Get("/{id}", handle(h.GetAccountByID()))
 		mux.Get("/topics", handle(auth(h.ListFollowedTopics())))
 	})
