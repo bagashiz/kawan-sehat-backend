@@ -149,12 +149,11 @@ func (q *Queries) SelectTopicByID(ctx context.Context, id uuid.UUID) (Topic, err
 const updateTopic = `-- name: UpdateTopic :exec
 UPDATE topics
 SET
-    name = COALESCE($2, name),
-    slug = COALESCE($3, slug),
-    description = COALESCE($4, description),
-    updated_at = $5
+  name = COALESCE($2, name),
+  slug = COALESCE($3, slug),
+  description = COALESCE($4, description),
+  updated_at = $5
 WHERE id = $1
-RETURNING id, name, slug, description, created_at, updated_at
 `
 
 type UpdateTopicParams struct {

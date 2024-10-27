@@ -42,6 +42,34 @@ func (r *PostgresRepository) AddAccount(ctx context.Context, account *user.Accou
 	return nil
 }
 
+// UpdateAccount updates user account data in postgres database.
+func (r *PostgresRepository) UpdateAccount(ctx context.Context, account *user.Account) error {
+	arg := postgres.UpdateAccountParams{
+		ID:       account.ID,
+		FullName: pgtype.Text{String: account.FullName, Valid: account.FullName != ""},
+		Username: pgtype.Text{String: account.Username, Valid: account.Username != ""},
+		Nik:      pgtype.Text{String: account.NIK, Valid: account.NIK != "" && len(account.NIK) == 16},
+		Email:    pgtype.Text{String: account.Email, Valid: account.Email != ""},
+		Password: pgtype.Text{String: account.Password, Valid: account.Password != ""},
+		Gender: postgres.NullAccountGender{
+			AccountGender: postgres.AccountGender(account.Gender), Valid: account.Gender != "",
+		},
+		Role: postgres.NullAccountRole{
+			AccountRole: postgres.AccountRole(account.Role), Valid: account.Role != "",
+		},
+		Avatar: postgres.NullAccountAvatar{
+			AccountAvatar: postgres.AccountAvatar(account.Avatar), Valid: account.Avatar != "",
+		},
+		IllnessHistory: pgtype.Text{String: account.IllnessHistory, Valid: account.IllnessHistory != ""},
+	}
+
+	if err := r.db.UpdateAccount(ctx, arg); err != nil {
+		return handleAccountError(err)
+	}
+
+	return nil
+}
+
 // GetAccountByUsername retrieves user account data from postgres database by username.
 func (r *PostgresRepository) GetAccountByUsername(ctx context.Context, username string) (*user.Account, error) {
 	result, err := r.db.SelectAccountByUsername(ctx, username)
@@ -84,6 +112,8 @@ func handleAccountError(err error) error {
 				return user.ErrAccountDuplicateUsername
 			case "accounts_email_key":
 				return user.ErrAccountDuplicateEmail
+			case "accounts_nik_key":
+				return user.ErrAccountDuplicateNIK
 			default:
 				return pgErr
 			}

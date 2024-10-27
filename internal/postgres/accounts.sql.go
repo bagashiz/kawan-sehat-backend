@@ -110,3 +110,50 @@ func (q *Queries) SelectAccountByUsername(ctx context.Context, username string) 
 	)
 	return i, err
 }
+
+const updateAccount = `-- name: UpdateAccount :exec
+UPDATE accounts
+SET
+  full_name = COALESCE($2, full_name),
+  username = COALESCE($3, username),
+  nik = COALESCE($4, nik),
+  email = COALESCE($5, email),
+  password = COALESCE($6, password),
+  gender = COALESCE($7, gender),
+  role = COALESCE($8, role),
+  avatar = COALESCE($9, avatar),
+  illness_history = COALESCE($10, illness_history),
+  updated_at = $11
+WHERE id = $1
+`
+
+type UpdateAccountParams struct {
+	ID             uuid.UUID
+	FullName       pgtype.Text
+	Username       pgtype.Text
+	Nik            pgtype.Text
+	Email          pgtype.Text
+	Password       pgtype.Text
+	Gender         NullAccountGender
+	Role           NullAccountRole
+	Avatar         NullAccountAvatar
+	IllnessHistory pgtype.Text
+	UpdatedAt      time.Time
+}
+
+func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) error {
+	_, err := q.db.Exec(ctx, updateAccount,
+		arg.ID,
+		arg.FullName,
+		arg.Username,
+		arg.Nik,
+		arg.Email,
+		arg.Password,
+		arg.Gender,
+		arg.Role,
+		arg.Avatar,
+		arg.IllnessHistory,
+		arg.UpdatedAt,
+	)
+	return err
+}

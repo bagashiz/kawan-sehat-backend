@@ -23,6 +23,7 @@ type Querier interface {
 	SelectTopicByID(ctx context.Context, id uuid.UUID) (Topic, error)
 	SelectTopicsByAccountID(ctx context.Context, accountID uuid.UUID) ([]Topic, error)
 	SelectTopicsByAccountIDPaginated(ctx context.Context, arg SelectTopicsByAccountIDPaginatedParams) ([]Topic, error)
+	UpdateAccount(ctx context.Context, arg UpdateAccountParams) error
 	UpdateTopic(ctx context.Context, arg UpdateTopicParams) error
 }
 
