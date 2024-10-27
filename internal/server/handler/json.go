@@ -62,10 +62,11 @@ func ptr(s string) *string {
 	return &s
 }
 
-// stringToInt32 converts a string to an int32 with a default value.
-func stringToInt32(s string, i int32) (int32, error) {
+// stringToInt32 converts a string to an int32,
+// if the string is empty, it returns the default value.
+func stringToInt32(s string, def int32) (int32, error) {
 	if s == "" {
-		return i, nil
+		return def, nil
 	}
 	i64, err := strconv.ParseInt(s, 10, 32)
 	if err != nil {

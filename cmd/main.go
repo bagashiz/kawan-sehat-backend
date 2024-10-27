@@ -43,7 +43,7 @@ func run(ctx context.Context, getEnv func(string) string) error {
 		return err
 	}
 
-	tokenizer, err := token.New(cfg.Token)
+	tknzr, err := token.New(cfg.Token)
 	if err != nil {
 		return err
 	}
@@ -60,14 +60,15 @@ func run(ctx context.Context, getEnv func(string) string) error {
 		return err
 	}
 
-	validator := validator.New()
-	postgresRepo := repository.New(db)
-	userSvc := user.NewService(postgresRepo, tokenizer)
-	topicSvc := topic.NewService(postgresRepo)
+	vldtr := validator.New()
+	pgRepo := repository.New(db)
 
-	h := handler.New(validator, userSvc, topicSvc)
-	m := middleware.New(tokenizer)
-	srv := server.New(cfg.App, h, m)
+	userSvc := user.NewService(pgRepo, tknzr)
+	topicSvc := topic.NewService(pgRepo)
+
+	hndlr := handler.New(vldtr, userSvc, topicSvc)
+	mw := middleware.New(tknzr)
+	srv := server.New(cfg.App, hndlr, mw)
 
 	slog.Info("starting the http server", "addr", srv.Addr)
 

@@ -24,9 +24,9 @@ type Tokenizer interface {
 
 // TokenPayload contains the information that is stored in the token.
 type TokenPayload struct {
-	ID       uuid.UUID
-	UserID   uuid.UUID
-	UserRole Role
+	ID        uuid.UUID
+	AccountID uuid.UUID
+	UserRole  Role
 }
 
 // newTokenPayload creates a new token payload.
@@ -36,9 +36,9 @@ func newTokenPayload(userID uuid.UUID, userRole Role) (*TokenPayload, error) {
 		return nil, errors.New("failed to generate token id")
 	}
 	return &TokenPayload{
-		ID:       id,
-		UserID:   userID,
-		UserRole: userRole,
+		ID:        id,
+		AccountID: userID,
+		UserRole:  userRole,
 	}, nil
 }
 

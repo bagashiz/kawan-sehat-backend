@@ -38,16 +38,6 @@ func New(name, description string) (*Topic, error) {
 	}, nil
 }
 
-// generateSlug generates a slug from the topic name.
-func generateSlug(name string) string {
-	slug := strings.ToLower(name)
-	slug = strings.ReplaceAll(slug, " ", "-")
-	// Remove non-alphanumeric characters except hyphens
-	re := regexp.MustCompile("[^a-z0-9-]+")
-	slug = re.ReplaceAllString(slug, "")
-	return slug
-}
-
 // Update modifies the topic's name and description.
 func (t *Topic) Update(name, description string) {
 	if name != "" {
@@ -58,4 +48,14 @@ func (t *Topic) Update(name, description string) {
 		t.Description = description
 	}
 	t.UpdatedAt = time.Now()
+}
+
+// generateSlug generates a slug from the topic name.
+func generateSlug(name string) string {
+	slug := strings.ToLower(name)
+	slug = strings.ReplaceAll(slug, " ", "-")
+	// Remove non-alphanumeric characters except hyphens
+	re := regexp.MustCompile("[^a-z0-9-]+")
+	slug = re.ReplaceAllString(slug, "")
+	return slug
 }
