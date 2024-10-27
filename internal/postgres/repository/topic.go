@@ -48,7 +48,6 @@ func (r *PostgresRepository) GetTopicByID(ctx context.Context, id uuid.UUID) (*t
 // ListTopics retrieves all topics data from postgres database.
 func (r *PostgresRepository) ListTopics(ctx context.Context, limit, offset int32) ([]*topic.Topic, error) {
 	var results []postgres.Topic
-	var topics []*topic.Topic
 	var err error
 
 	if limit == 0 && offset == 0 {
@@ -63,10 +62,11 @@ func (r *PostgresRepository) ListTopics(ctx context.Context, limit, offset int32
 		return nil, err
 	}
 
-	for _, result := range results {
-		topic := result.ToDomain()
-		topics = append(topics, topic)
+	topics := make([]*topic.Topic, len(results))
+	for i, result := range results {
+		topics[i] = result.ToDomain()
 	}
+
 	return topics, nil
 }
 

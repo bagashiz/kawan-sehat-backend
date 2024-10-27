@@ -159,6 +159,12 @@ type Account struct {
 	UpdatedAt      time.Time
 }
 
+type AccountTopic struct {
+	AccountID uuid.UUID
+	TopicID   uuid.UUID
+	CreatedAt time.Time
+}
+
 type Topic struct {
 	ID          uuid.UUID
 	Name        string

@@ -11,14 +11,18 @@ import (
 )
 
 type Querier interface {
+	DeleteAccountTopic(ctx context.Context, arg DeleteAccountTopicParams) (int64, error)
 	DeleteTopic(ctx context.Context, id uuid.UUID) (int64, error)
 	InsertAccount(ctx context.Context, arg InsertAccountParams) error
+	InsertAccountTopic(ctx context.Context, arg InsertAccountTopicParams) error
 	InsertTopic(ctx context.Context, arg InsertTopicParams) error
 	SelectAccountByID(ctx context.Context, id uuid.UUID) (Account, error)
 	SelectAccountByUsername(ctx context.Context, username string) (Account, error)
 	SelectAllTopics(ctx context.Context) ([]Topic, error)
 	SelectAllTopicsPaginated(ctx context.Context, arg SelectAllTopicsPaginatedParams) ([]Topic, error)
 	SelectTopicByID(ctx context.Context, id uuid.UUID) (Topic, error)
+	SelectTopicsByAccountID(ctx context.Context, accountID uuid.UUID) ([]Topic, error)
+	SelectTopicsByAccountIDPaginated(ctx context.Context, arg SelectTopicsByAccountIDPaginatedParams) ([]Topic, error)
 	UpdateTopic(ctx context.Context, arg UpdateTopicParams) error
 }
 
