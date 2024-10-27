@@ -22,15 +22,7 @@ func (r *PostgresRepository) AddTopic(ctx context.Context, t *topic.Topic) error
 	}
 
 	if err := r.db.InsertTopic(ctx, arg); err != nil {
-		if pgErr, ok := err.(*pgconn.PgError); ok {
-			if pgerrcode.IsDataException(pgErr.Code) {
-				return topic.ErrTopicInvalid
-			}
-			if pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
-				return topic.ErrTopicDuplicateName
-			}
-		}
-		return err
+		return handleTopicError(err)
 	}
 
 	return nil
@@ -85,15 +77,7 @@ func (r *PostgresRepository) UpdateTopic(ctx context.Context, t *topic.Topic) er
 		Description: pgtype.Text{String: t.Description, Valid: t.Description != ""},
 	}
 	if err := r.db.UpdateTopic(ctx, arg); err != nil {
-		if pgErr, ok := err.(*pgconn.PgError); ok {
-			if pgerrcode.IsDataException(pgErr.Code) {
-				return topic.ErrTopicInvalid
-			}
-			if pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
-				return topic.ErrTopicDuplicateName
-			}
-		}
-		return err
+		return handleTopicError(err)
 	}
 	return nil
 }
@@ -110,4 +94,19 @@ func (r *PostgresRepository) DeleteTopic(ctx context.Context, id uuid.UUID) erro
 	}
 
 	return nil
+}
+
+// handleTopicError handles topic postgres repository errors and returns domain errors.
+func handleTopicError(err error) error {
+	if pgErr, ok := err.(*pgconn.PgError); ok {
+		switch {
+		case pgerrcode.IsDataException(pgErr.Code):
+			return topic.ErrTopicInvalid
+		case pgerrcode.IsIntegrityConstraintViolation(pgErr.Code):
+			return topic.ErrTopicDuplicateName
+		default:
+			return err
+		}
+	}
+	return err
 }

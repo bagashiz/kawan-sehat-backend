@@ -36,22 +36,7 @@ func (r *PostgresRepository) AddAccount(ctx context.Context, account *user.Accou
 	}
 
 	if err := r.db.InsertAccount(ctx, arg); err != nil {
-		if pgErr, ok := err.(*pgconn.PgError); ok {
-			if pgerrcode.IsDataException(pgErr.Code) {
-				return user.ErrAccountInvalid
-			}
-			if pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
-				switch pgErr.ConstraintName {
-				case "accounts_username_key":
-					return user.ErrAccountDuplicateUsername
-				case "accounts_email_key":
-					return user.ErrAccountDuplicateEmail
-				default:
-					return pgErr
-				}
-			}
-		}
-		return err
+		return handleAccountError(err)
 	}
 
 	return nil
@@ -85,4 +70,26 @@ func (r *PostgresRepository) GetAccountByID(ctx context.Context, id uuid.UUID) (
 	account := result.ToDomain()
 
 	return account, nil
+}
+
+// handleAccountError handles account postgres repository errors and returns domain errors.
+func handleAccountError(err error) error {
+	if pgErr, ok := err.(*pgconn.PgError); ok {
+		switch {
+		case pgerrcode.IsDataException(pgErr.Code):
+			return user.ErrAccountInvalid
+		case pgerrcode.IsIntegrityConstraintViolation(pgErr.Code):
+			switch pgErr.ConstraintName {
+			case "accounts_username_key":
+				return user.ErrAccountDuplicateUsername
+			case "accounts_email_key":
+				return user.ErrAccountDuplicateEmail
+			default:
+				return pgErr
+			}
+		default:
+			return pgErr
+		}
+	}
+	return err
 }
