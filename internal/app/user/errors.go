@@ -14,7 +14,7 @@ var (
 	// list of errors for authentication and authorization.
 	ErrAuthHeaderMissing   = UserError{"missing authorization header"}
 	ErrAuthHeaderInvalid   = UserError{"invalid authorization header"}
-	ErrAccountUnauthorized = UserError{"email or password is incorrect"}
+	ErrAccountUnauthorized = UserError{"username or password is incorrect"}
 	ErrAccountForbidden    = UserError{"account is forbidden to access the resource"}
 	// list of errors for token provider.
 	ErrTokenCreationFail = UserError{"failed to create token"}
@@ -24,5 +24,6 @@ var (
 	ErrAccountInvalid           = UserError{"account data is invalid"}
 	ErrAccountDuplicateEmail    = UserError{"account with this email already exists"}
 	ErrAccountDuplicateUsername = UserError{"account with this username already exists"}
+	ErrAccountDuplicateNIK      = UserError{"account with this nik already exists"}
 	ErrAccountNotFound          = UserError{"account not found"}
 )

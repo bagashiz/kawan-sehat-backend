@@ -85,3 +85,45 @@ func (a *Account) ComparePassword(password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(a.Password), []byte(password))
 	return err == nil
 }
+
+// Update updates the account with the given parameters.
+func (a *Account) Update(
+	fullName, userName, nik, email, password, gender, role, avatar, illnessHistory string,
+) error {
+	if fullName != "" {
+		a.FullName = fullName
+	}
+	if userName != "" {
+		a.Username = userName
+	}
+	if nik != "" && len(nik) == 16 {
+		a.NIK = nik
+	}
+	if email != "" {
+		a.Email = email
+	}
+	if gender != "" {
+		a.Gender = Gender(gender)
+	}
+	if role != "" {
+		if a.Role != Admin {
+			return ErrAccountForbidden
+		}
+		a.Role = Role(role)
+	}
+	if avatar != "" {
+		a.Avatar = Avatar(avatar)
+	}
+	if illnessHistory != "" {
+		a.IllnessHistory = illnessHistory
+	}
+	if password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		if err != nil {
+			return errors.New("failed to hash account password")
+		}
+		a.Password = string(hashedPassword)
+	}
+	a.UpdatedAt = time.Now()
+	return nil
+}
