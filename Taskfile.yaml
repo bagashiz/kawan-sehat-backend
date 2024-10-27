@@ -65,7 +65,7 @@ tasks:
 
   build:
     desc: "Build binary"
-    cmd: go build -o ./bin/{{.APP_NAME}} ./cmd/main.go
+    cmd: CGO_ENABLED=0 go build -ldflags="-s -w" -o ./bin/{{.APP_NAME}} ./cmd/main.go
     requires:
       vars:
         - APP_NAME
