@@ -24,9 +24,9 @@ type Tokenizer interface {
 
 // TokenPayload contains the information that is stored in the token.
 type TokenPayload struct {
-	UserRole Role
 	ID       uuid.UUID
 	UserID   uuid.UUID
+	UserRole Role
 }
 
 // newTokenPayload creates a new token payload.

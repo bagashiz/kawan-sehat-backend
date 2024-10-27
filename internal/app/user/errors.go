@@ -11,16 +11,16 @@ func (ue UserError) Error() string {
 }
 
 var (
-	// list of errors for authentication and authorization
+	// list of errors for authentication and authorization.
 	ErrAuthHeaderMissing   = UserError{"missing authorization header"}
 	ErrAuthHeaderInvalid   = UserError{"invalid authorization header"}
 	ErrAccountUnauthorized = UserError{"email or password is incorrect"}
 	ErrAccountForbidden    = UserError{"account is forbidden to access the resource"}
-	// list of errors for token provider
+	// list of errors for token provider.
 	ErrTokenCreationFail = UserError{"failed to create token"}
 	ErrTokenExpired      = UserError{"token has expired"}
 	ErrTokenInvalid      = UserError{"invalid token"}
-	// list of errors for user repository
+	// list of errors for user repository.
 	ErrAccountInvalid           = UserError{"account data is invalid"}
 	ErrAccountDuplicateEmail    = UserError{"account with this email already exists"}
 	ErrAccountDuplicateUsername = UserError{"account with this username already exists"}

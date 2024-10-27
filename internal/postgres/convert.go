@@ -5,7 +5,7 @@ import (
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 )
 
-// ToDomain converts generated Account struct to domain account struct
+// ToDomain converts generated Account struct to domain account struct.
 func (a Account) ToDomain() *user.Account {
 	return &user.Account{
 		ID:             a.ID,
@@ -23,7 +23,7 @@ func (a Account) ToDomain() *user.Account {
 	}
 }
 
-// ToDomain converts generated Topic struct to domain account struct
+// ToDomain converts generated Topic struct to domain account struct.
 func (t Topic) ToDomain() *topic.Topic {
 	return &topic.Topic{
 		ID:          t.ID,
