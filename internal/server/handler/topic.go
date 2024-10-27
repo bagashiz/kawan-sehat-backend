@@ -140,20 +140,9 @@ type listTopicsResponse struct {
 // ListTopics is the handler for the topic list route.
 func (h *Handler) ListTopics() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		limit := r.URL.Query().Get("limit")
-		offset := r.URL.Query().Get("offset")
+		limit, offset := getLimitOffset(r)
 
-		limit32, err := stringToInt32(limit, 0)
-		if err != nil {
-			return BadRequest(err)
-		}
-
-		offset32, err := stringToInt32(offset, 0)
-		if err != nil {
-			return BadRequest(err)
-		}
-
-		topics, err := h.topicSvc.ListTopics(r.Context(), limit32, offset32)
+		topics, err := h.topicSvc.ListTopics(r.Context(), limit, offset)
 		if err != nil {
 			return handleTopicError(err)
 		}
@@ -171,8 +160,8 @@ func (h *Handler) ListTopics() APIFunc {
 		}
 
 		res := &listTopicsResponse{
-			Limit:  limit32,
-			Offset: offset32,
+			Limit:  limit,
+			Offset: offset,
 			Count:  len(topics),
 			Topics: topicRes,
 		}
