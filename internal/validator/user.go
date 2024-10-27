@@ -18,7 +18,7 @@ func usernameValidation(fl validator.FieldLevel) bool {
 func roleValidation(fl validator.FieldLevel) bool {
 	role := fl.Field().String()
 	switch role {
-	case "PATIENT", "EXPERT", "ADMIN":
+	case string(user.Patient), string(user.Expert), string(user.Admin):
 		return true
 	default:
 		return false
@@ -27,20 +27,21 @@ func roleValidation(fl validator.FieldLevel) bool {
 
 // avatarValidation validates user avatar accounts.
 func avatarValidation(fl validator.FieldLevel) bool {
-	avatar := fl.Field().Interface().(user.Avatar)
+	avatar := fl.Field().String()
 	switch avatar {
-	case "NONE", "OLD_FEMALE", "OLD_MALE", "YOUNG_FEMALE", "YOUNG_MALE":
+	case string(user.None), string(user.OldFemale), string(user.OldMale),
+		string(user.YoungFemale), string(user.YoungMale):
 		return true
 	default:
 		return false
 	}
 }
 
-// genderValidation validates user role accounts.
+// genderValidation validates user gender accounts.
 func genderValidation(fl validator.FieldLevel) bool {
-	gender := fl.Field().Interface().(user.Gender)
+	gender := fl.Field().String()
 	switch gender {
-	case "PATIENT", "EXPERT", "ADMIN":
+	case string(user.Female), string(user.Male), string(user.Unspecified):
 		return true
 	default:
 		return false
