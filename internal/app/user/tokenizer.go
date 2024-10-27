@@ -42,8 +42,8 @@ func newTokenPayload(userID uuid.UUID, userRole Role) (*TokenPayload, error) {
 	}, nil
 }
 
-// getTokenPayload extracts the token payload from the context.
-func getTokenPayload(ctx context.Context) (*TokenPayload, error) {
+// GetTokenPayload extracts the token payload from the context.
+func GetTokenPayload(ctx context.Context) (*TokenPayload, error) {
 	payload, ok := ctx.Value(AuthPayloadKey).(*TokenPayload)
 	if !ok {
 		return nil, ErrAccountUnauthorized
