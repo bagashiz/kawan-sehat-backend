@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/bagashiz/kawan-sehat-backend/internal/validator"
 )
@@ -61,4 +62,16 @@ func writeJSON(w http.ResponseWriter, statusCode int, data any, err error) error
 // ptr returns a pointer to the given string.
 func ptr(s string) *string {
 	return &s
+}
+
+// stringToInt32 converts a string to an int32 with a default value.
+func stringToInt32(s string, i int32) (int32, error) {
+	if s == "" {
+		return i, nil
+	}
+	i64, err := strconv.ParseInt(s, 10, 32)
+	if err != nil {
+		return 0, err
+	}
+	return int32(i64), nil
 }

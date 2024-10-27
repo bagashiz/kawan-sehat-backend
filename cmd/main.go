@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/topic"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/bagashiz/kawan-sehat-backend/internal/config"
 	"github.com/bagashiz/kawan-sehat-backend/internal/postgres"
@@ -58,8 +59,9 @@ func run(ctx context.Context, getEnv func(string) string) error {
 
 	postgresRepo := repository.New(db)
 	userSvc := user.NewService(postgresRepo, tokenizer)
+	topicSvc := topic.NewService(postgresRepo)
 
-	srv := server.New(cfg.App, userSvc)
+	srv := server.New(cfg.App, tokenizer, userSvc, topicSvc)
 
 	slog.Info("starting the http server", "addr", srv.Addr)
 

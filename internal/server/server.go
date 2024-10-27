@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/topic"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/bagashiz/kawan-sehat-backend/internal/config"
 	"golang.org/x/sync/errgroup"
@@ -17,9 +18,14 @@ type Server struct {
 }
 
 // New creates a new http.Server type, configures the routes, and adds middleware.
-func New(cfg *config.App, userSvc *user.Service) *Server {
+func New(
+	cfg *config.App,
+	tokenizer user.Tokenizer,
+	userSvc *user.Service,
+	topicSvc *topic.Service,
+) *Server {
 	addr := net.JoinHostPort(cfg.Host, cfg.Port)
-	router := registerRoutes(userSvc)
+	router := registerRoutes(tokenizer, userSvc, topicSvc)
 
 	server := &http.Server{
 		Addr:    addr,
