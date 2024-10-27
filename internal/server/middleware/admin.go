@@ -15,7 +15,7 @@ func (m *Middleware) Admin(h handler.APIFunc) handler.APIFunc {
 			return handler.UnauthorizedRequest(err)
 		}
 
-		if payload.UserRole != user.Admin {
+		if payload.AccountRole != user.Admin {
 			return handler.ForbiddenRequest(user.ErrAccountForbidden)
 		}
 
