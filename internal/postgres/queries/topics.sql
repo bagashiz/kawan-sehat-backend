@@ -1,8 +1,8 @@
 -- name: InsertTopic :exec
 INSERT INTO topics (
-    id, name, slug, description
+    id, name, slug, description, created_at, updated_at
 ) VALUES ( 
-  $1, $2, $3, $4
+  $1, $2, $3, $4, $5, $6
 );
 
 -- name: SelectTopicByID :one

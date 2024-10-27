@@ -19,6 +19,8 @@ func (r *PostgresRepository) AddTopic(ctx context.Context, t *topic.Topic) error
 		Name:        t.Name,
 		Slug:        t.Slug,
 		Description: t.Description,
+		CreatedAt:   t.CreatedAt,
+		UpdatedAt:   t.UpdatedAt,
 	}
 
 	if err := r.db.InsertTopic(ctx, arg); err != nil {
@@ -75,6 +77,7 @@ func (r *PostgresRepository) UpdateTopic(ctx context.Context, t *topic.Topic) er
 		Name:        pgtype.Text{String: t.Name, Valid: t.Name != ""},
 		Slug:        pgtype.Text{String: t.Slug, Valid: t.Slug != ""},
 		Description: pgtype.Text{String: t.Description, Valid: t.Description != ""},
+		UpdatedAt:   t.UpdatedAt,
 	}
 	if err := r.db.UpdateTopic(ctx, arg); err != nil {
 		return handleTopicError(err)

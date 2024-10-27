@@ -28,9 +28,9 @@ func (q *Queries) DeleteTopic(ctx context.Context, id uuid.UUID) (int64, error) 
 
 const insertTopic = `-- name: InsertTopic :exec
 INSERT INTO topics (
-    id, name, slug, description
+    id, name, slug, description, created_at, updated_at
 ) VALUES ( 
-  $1, $2, $3, $4
+  $1, $2, $3, $4, $5, $6
 )
 `
 
@@ -39,6 +39,8 @@ type InsertTopicParams struct {
 	Name        string
 	Slug        string
 	Description string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 func (q *Queries) InsertTopic(ctx context.Context, arg InsertTopicParams) error {
@@ -47,6 +49,8 @@ func (q *Queries) InsertTopic(ctx context.Context, arg InsertTopicParams) error 
 		arg.Name,
 		arg.Slug,
 		arg.Description,
+		arg.CreatedAt,
+		arg.UpdatedAt,
 	)
 	return err
 }
