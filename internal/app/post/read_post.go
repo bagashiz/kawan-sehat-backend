@@ -3,6 +3,7 @@ package post
 import (
 	"context"
 
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/google/uuid"
 )
 
@@ -58,4 +59,14 @@ func (s *Service) ListPostsByAccount(ctx context.Context, accountID string, limi
 		return nil, 0, err
 	}
 	return s.repo.ListPostsByAccountID(ctx, uuid, limit, page)
+}
+
+// ListBookmarks lists all bookmarked posts from the repository by account ID with optional filters.
+func (s *Service) ListBookmarks(ctx context.Context, limit, page int32) ([]*Post, int64, error) {
+	tokenPayload, err := user.GetTokenPayload(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	accountID := tokenPayload.AccountID
+	return s.repo.ListAccountBookmarks(ctx, accountID, limit, page)
 }

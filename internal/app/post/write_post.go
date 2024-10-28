@@ -83,3 +83,21 @@ func (s *Service) DeletePost(ctx context.Context, id string) error {
 	}
 	return s.repo.DeletePost(ctx, uuid)
 }
+
+// BookmarkPost adds a post to the account's bookmarks.
+func (s *Service) BookmarkPost(ctx context.Context, postID string) error {
+	bookmark, err := createBookmark(ctx, postID)
+	if err != nil {
+		return err
+	}
+	return s.repo.BookmarkPost(ctx, bookmark)
+}
+
+// UnbookmarkPost removes a post from the account's bookmarks.
+func (s *Service) UnbookmarkPost(ctx context.Context, postID string) error {
+	bookmark, err := createBookmark(ctx, postID)
+	if err != nil {
+		return err
+	}
+	return s.repo.UnbookmarkPost(ctx, bookmark)
+}

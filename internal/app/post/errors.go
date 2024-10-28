@@ -12,9 +12,12 @@ func (te PostError) Error() string {
 
 var (
 	// list of errors for post repository.
-	ErrPostInvalid         = PostError{"post data is invalid"}
-	ErrPostTopicNotFound   = PostError{"post topic not found"}
-	ErrPostAccountNotFound = PostError{"post account not found"}
-	ErrPostActionForbidden = PostError{"post action is forbidden"}
-	ErrPostNotFound        = PostError{"post not found"}
+	ErrPostInvalid             = PostError{"post data is invalid"}
+	ErrPostTopicNotFound       = PostError{"post topic not found"}
+	ErrPostAccountNotFound     = PostError{"post account not found"}
+	ErrPostActionForbidden     = PostError{"post action is forbidden"}
+	ErrPostNotFound            = PostError{"post not found"}
+	ErrBookmarkInvalid         = PostError{"bookmark data is invalid"}
+	ErrBookmarkExists          = PostError{"bookmark already exists"}
+	ErrBookmarkAlreadyUnmarked = PostError{"bookmark is already unmarked"}
 )
