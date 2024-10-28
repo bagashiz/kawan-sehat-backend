@@ -11,7 +11,7 @@ func (te TopicError) Error() string {
 }
 
 var (
-	// list of errors for user repository.
+	// list of errors for topic repository.
 	ErrTopicInvalid                  = TopicError{"topic data is invalid"}
 	ErrTopicDuplicateName            = TopicError{"topic with this name already exists"}
 	ErrTopicNotFound                 = TopicError{"topic not found"}
