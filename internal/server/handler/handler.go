@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/comment"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/post"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/topic"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
@@ -13,10 +14,11 @@ import (
 
 // Handler holds dependencies for handling HTTP requests.
 type Handler struct {
-	validator *validator.Validator
-	userSvc   *user.Service
-	topicSvc  *topic.Service
-	postSvc   *post.Service
+	validator  *validator.Validator
+	userSvc    *user.Service
+	topicSvc   *topic.Service
+	postSvc    *post.Service
+	commentSvc *comment.Service
 }
 
 // New creates a new Handler instance.
@@ -25,12 +27,14 @@ func New(
 	userSvc *user.Service,
 	topicSvc *topic.Service,
 	postSvc *post.Service,
+	commentSvc *comment.Service,
 ) *Handler {
 	return &Handler{
-		validator: validator,
-		userSvc:   userSvc,
-		topicSvc:  topicSvc,
-		postSvc:   postSvc,
+		validator:  validator,
+		userSvc:    userSvc,
+		topicSvc:   topicSvc,
+		postSvc:    postSvc,
+		commentSvc: commentSvc,
 	}
 }
 

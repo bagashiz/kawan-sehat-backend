@@ -14,11 +14,13 @@ func registerRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 	userRouter := userRoutes(h, m)
 	topicRouter := topicRoutes(h, m)
 	postRouter := postRoutes(h, m)
+	commentRouter := commentRoutes(h, m)
 
 	mux.Route("/v1", func(r chi.Router) {
 		r.Mount("/users", userRouter)
 		r.Mount("/topics", topicRouter)
 		r.Mount("/posts", postRouter)
+		r.Mount("/comments", commentRouter)
 	})
 
 	mux.Get("/", handle(h.NotFound()))
@@ -73,6 +75,18 @@ func postRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 		mux.Delete("/{id}/unmark", handle(auth(h.Unbookmark())))
 		mux.Get("/{id}", handle(h.GetPostByID()))
 		mux.Get("/", handle(h.ListPosts()))
+		mux.Get("/{id}/comments", handle(auth(h.ListCommentsByPostID())))
+	})
+	return mux
+}
+
+// commentRoutes configures the routes for the post service.
+func commentRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
+	auth := m.Auth
+	mux := chi.NewRouter()
+	mux.Route("/comments", func(r chi.Router) {
+		mux.Post("/", handle(auth(h.CreateComment())))
+		mux.Delete("/{id}", handle(auth(h.DeleteComment())))
 	})
 	return mux
 }
