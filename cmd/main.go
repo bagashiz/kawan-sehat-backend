@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/post"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/topic"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/bagashiz/kawan-sehat-backend/internal/config"
@@ -65,8 +66,9 @@ func run(ctx context.Context, getEnv func(string) string) error {
 
 	userSvc := user.NewService(pgRepo, tknzr)
 	topicSvc := topic.NewService(pgRepo)
+	postSvc := post.NewService(pgRepo)
 
-	hndlr := handler.New(vldtr, userSvc, topicSvc)
+	hndlr := handler.New(vldtr, userSvc, topicSvc, postSvc)
 	mw := middleware.New(tknzr)
 	srv := server.New(cfg.App, hndlr, mw)
 

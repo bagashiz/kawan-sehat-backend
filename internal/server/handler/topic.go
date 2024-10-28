@@ -130,6 +130,7 @@ func (h *Handler) GetTopicByID() APIFunc {
 	}
 }
 
+// listTopicsResponse holds the response data for the list topics handler.
 type listTopicsResponse struct {
 	Limit  int32           `json:"limit"`
 	Offset int32           `json:"offset"`

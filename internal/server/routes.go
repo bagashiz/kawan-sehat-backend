@@ -13,10 +13,12 @@ func registerRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 	mux := chi.NewRouter()
 	userRouter := userRoutes(h, m)
 	topicRouter := topicRoutes(h, m)
+	postRouter := postRoutes(h, m)
 
 	mux.Route("/v1", func(r chi.Router) {
 		r.Mount("/users", userRouter)
 		r.Mount("/topics", topicRouter)
+		r.Mount("/posts", postRouter)
 	})
 
 	mux.Get("/", handle(h.NotFound()))
@@ -54,6 +56,20 @@ func topicRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 		mux.Delete("/{id}", handle(admin(h.DeleteTopic())))
 		mux.Get("/{id}", handle(h.GetTopicByID()))
 		mux.Get("/", handle(h.ListTopics()))
+	})
+	return mux
+}
+
+// postRoutes configures the routes for the post service.
+func postRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
+	auth := m.Auth
+	mux := chi.NewRouter()
+	mux.Route("/posts", func(r chi.Router) {
+		mux.Post("/", handle(auth(h.CreatePost())))
+		mux.Put("/{id}", handle(auth(h.UpdatePost())))
+		mux.Delete("/{id}", handle(auth(h.DeletePost())))
+		mux.Get("/{id}", handle(h.GetPostByID()))
+		mux.Get("/", handle(h.ListPosts()))
 	})
 	return mux
 }
