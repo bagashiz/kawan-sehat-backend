@@ -54,7 +54,7 @@ func (s *Service) UpdatePost(ctx context.Context, params UpdatePostParams) (*Pos
 	if err != nil {
 		return nil, err
 	}
-	if tokenPayload.AccountID != post.AccountID {
+	if tokenPayload.AccountID != post.Account.ID {
 		return nil, ErrPostActionForbidden
 	}
 	post.Update(params.Title, params.Content)
@@ -78,7 +78,7 @@ func (s *Service) DeletePost(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	if tokenPayload.AccountID != post.AccountID && tokenPayload.AccountRole != user.Admin {
+	if tokenPayload.AccountID != post.Account.ID && tokenPayload.AccountRole != user.Admin {
 		return ErrPostActionForbidden
 	}
 	return s.repo.DeletePost(ctx, uuid)

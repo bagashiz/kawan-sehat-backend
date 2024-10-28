@@ -24,30 +24,6 @@ func (q *Queries) CountPosts(ctx context.Context) (int64, error) {
 	return count, err
 }
 
-const countPostsByAccountID = `-- name: CountPostsByAccountID :one
-SELECT COUNT(id) FROM posts
-WHERE account_id = $1
-`
-
-func (q *Queries) CountPostsByAccountID(ctx context.Context, accountID uuid.UUID) (int64, error) {
-	row := q.db.QueryRow(ctx, countPostsByAccountID, accountID)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const countPostsByTopicID = `-- name: CountPostsByTopicID :one
-SELECT COUNT(id) FROM posts
-WHERE topic_id = $1
-`
-
-func (q *Queries) CountPostsByTopicID(ctx context.Context, topicID uuid.UUID) (int64, error) {
-	row := q.db.QueryRow(ctx, countPostsByTopicID, topicID)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
 const deletePost = `-- name: DeletePost :execrows
 DELETE FROM posts
 WHERE id = $1
@@ -93,19 +69,34 @@ func (q *Queries) InsertPost(ctx context.Context, arg InsertPostParams) error {
 }
 
 const selectAllPosts = `-- name: SelectAllPosts :many
-SELECT id, account_id, topic_id, title, content, created_at, updated_at FROM posts
-ORDER BY created_at DESC
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+ORDER BY p.created_at DESC
 `
 
-func (q *Queries) SelectAllPosts(ctx context.Context) ([]Post, error) {
+type SelectAllPostsRow struct {
+	ID              uuid.UUID
+	AccountID       uuid.UUID
+	TopicID         uuid.UUID
+	Title           string
+	Content         string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	AccountUsername string
+	TopicName       string
+}
+
+func (q *Queries) SelectAllPosts(ctx context.Context) ([]SelectAllPostsRow, error) {
 	rows, err := q.db.Query(ctx, selectAllPosts)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Post{}
+	items := []SelectAllPostsRow{}
 	for rows.Next() {
-		var i Post
+		var i SelectAllPostsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.AccountID,
@@ -114,6 +105,8 @@ func (q *Queries) SelectAllPosts(ctx context.Context) ([]Post, error) {
 			&i.Content,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.AccountUsername,
+			&i.TopicName,
 		); err != nil {
 			return nil, err
 		}
@@ -126,8 +119,11 @@ func (q *Queries) SelectAllPosts(ctx context.Context) ([]Post, error) {
 }
 
 const selectAllPostsPaginated = `-- name: SelectAllPostsPaginated :many
-SELECT id, account_id, topic_id, title, content, created_at, updated_at FROM posts
-ORDER BY created_at DESC
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+ORDER BY p.created_at DESC
 LIMIT $1
 OFFSET $2
 `
@@ -137,15 +133,27 @@ type SelectAllPostsPaginatedParams struct {
 	Offset int32
 }
 
-func (q *Queries) SelectAllPostsPaginated(ctx context.Context, arg SelectAllPostsPaginatedParams) ([]Post, error) {
+type SelectAllPostsPaginatedRow struct {
+	ID              uuid.UUID
+	AccountID       uuid.UUID
+	TopicID         uuid.UUID
+	Title           string
+	Content         string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	AccountUsername string
+	TopicName       string
+}
+
+func (q *Queries) SelectAllPostsPaginated(ctx context.Context, arg SelectAllPostsPaginatedParams) ([]SelectAllPostsPaginatedRow, error) {
 	rows, err := q.db.Query(ctx, selectAllPostsPaginated, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Post{}
+	items := []SelectAllPostsPaginatedRow{}
 	for rows.Next() {
-		var i Post
+		var i SelectAllPostsPaginatedRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.AccountID,
@@ -154,6 +162,8 @@ func (q *Queries) SelectAllPostsPaginated(ctx context.Context, arg SelectAllPost
 			&i.Content,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.AccountUsername,
+			&i.TopicName,
 		); err != nil {
 			return nil, err
 		}
@@ -166,14 +176,29 @@ func (q *Queries) SelectAllPostsPaginated(ctx context.Context, arg SelectAllPost
 }
 
 const selectPostByID = `-- name: SelectPostByID :one
-SELECT id, account_id, topic_id, title, content, created_at, updated_at FROM posts
-WHERE id = $1
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+WHERE p.id = $1
 LIMIT 1
 `
 
-func (q *Queries) SelectPostByID(ctx context.Context, id uuid.UUID) (Post, error) {
+type SelectPostByIDRow struct {
+	ID              uuid.UUID
+	AccountID       uuid.UUID
+	TopicID         uuid.UUID
+	Title           string
+	Content         string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	AccountUsername string
+	TopicName       string
+}
+
+func (q *Queries) SelectPostByID(ctx context.Context, id uuid.UUID) (SelectPostByIDRow, error) {
 	row := q.db.QueryRow(ctx, selectPostByID, id)
-	var i Post
+	var i SelectPostByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.AccountID,
@@ -182,25 +207,42 @@ func (q *Queries) SelectPostByID(ctx context.Context, id uuid.UUID) (Post, error
 		&i.Content,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.AccountUsername,
+		&i.TopicName,
 	)
 	return i, err
 }
 
 const selectPostsByAccountID = `-- name: SelectPostsByAccountID :many
-SELECT id, account_id, topic_id, title, content, created_at, updated_at FROM posts
-WHERE account_id = $1
-ORDER BY created_at DESC
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+WHERE p.account_id = $1
+ORDER BY p.created_at DESC
 `
 
-func (q *Queries) SelectPostsByAccountID(ctx context.Context, accountID uuid.UUID) ([]Post, error) {
+type SelectPostsByAccountIDRow struct {
+	ID              uuid.UUID
+	AccountID       uuid.UUID
+	TopicID         uuid.UUID
+	Title           string
+	Content         string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	AccountUsername string
+	TopicName       string
+}
+
+func (q *Queries) SelectPostsByAccountID(ctx context.Context, accountID uuid.UUID) ([]SelectPostsByAccountIDRow, error) {
 	rows, err := q.db.Query(ctx, selectPostsByAccountID, accountID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Post{}
+	items := []SelectPostsByAccountIDRow{}
 	for rows.Next() {
-		var i Post
+		var i SelectPostsByAccountIDRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.AccountID,
@@ -209,6 +251,8 @@ func (q *Queries) SelectPostsByAccountID(ctx context.Context, accountID uuid.UUI
 			&i.Content,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.AccountUsername,
+			&i.TopicName,
 		); err != nil {
 			return nil, err
 		}
@@ -221,9 +265,12 @@ func (q *Queries) SelectPostsByAccountID(ctx context.Context, accountID uuid.UUI
 }
 
 const selectPostsByAccountIDPaginated = `-- name: SelectPostsByAccountIDPaginated :many
-SELECT id, account_id, topic_id, title, content, created_at, updated_at FROM posts
-WHERE account_id = $1
-ORDER BY created_at DESC
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+WHERE p.account_id = $1
+ORDER BY p.created_at DESC
 LIMIT $2
 OFFSET $3
 `
@@ -234,15 +281,27 @@ type SelectPostsByAccountIDPaginatedParams struct {
 	Offset    int32
 }
 
-func (q *Queries) SelectPostsByAccountIDPaginated(ctx context.Context, arg SelectPostsByAccountIDPaginatedParams) ([]Post, error) {
+type SelectPostsByAccountIDPaginatedRow struct {
+	ID              uuid.UUID
+	AccountID       uuid.UUID
+	TopicID         uuid.UUID
+	Title           string
+	Content         string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	AccountUsername string
+	TopicName       string
+}
+
+func (q *Queries) SelectPostsByAccountIDPaginated(ctx context.Context, arg SelectPostsByAccountIDPaginatedParams) ([]SelectPostsByAccountIDPaginatedRow, error) {
 	rows, err := q.db.Query(ctx, selectPostsByAccountIDPaginated, arg.AccountID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Post{}
+	items := []SelectPostsByAccountIDPaginatedRow{}
 	for rows.Next() {
-		var i Post
+		var i SelectPostsByAccountIDPaginatedRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.AccountID,
@@ -251,6 +310,8 @@ func (q *Queries) SelectPostsByAccountIDPaginated(ctx context.Context, arg Selec
 			&i.Content,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.AccountUsername,
+			&i.TopicName,
 		); err != nil {
 			return nil, err
 		}
@@ -263,20 +324,35 @@ func (q *Queries) SelectPostsByAccountIDPaginated(ctx context.Context, arg Selec
 }
 
 const selectPostsByTopicID = `-- name: SelectPostsByTopicID :many
-SELECT id, account_id, topic_id, title, content, created_at, updated_at FROM posts
-WHERE topic_id = $1
-ORDER BY created_at DESC
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+WHERE p.topic_id = $1
+ORDER BY p.created_at DESC
 `
 
-func (q *Queries) SelectPostsByTopicID(ctx context.Context, topicID uuid.UUID) ([]Post, error) {
+type SelectPostsByTopicIDRow struct {
+	ID              uuid.UUID
+	AccountID       uuid.UUID
+	TopicID         uuid.UUID
+	Title           string
+	Content         string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	AccountUsername string
+	TopicName       string
+}
+
+func (q *Queries) SelectPostsByTopicID(ctx context.Context, topicID uuid.UUID) ([]SelectPostsByTopicIDRow, error) {
 	rows, err := q.db.Query(ctx, selectPostsByTopicID, topicID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Post{}
+	items := []SelectPostsByTopicIDRow{}
 	for rows.Next() {
-		var i Post
+		var i SelectPostsByTopicIDRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.AccountID,
@@ -285,6 +361,8 @@ func (q *Queries) SelectPostsByTopicID(ctx context.Context, topicID uuid.UUID) (
 			&i.Content,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.AccountUsername,
+			&i.TopicName,
 		); err != nil {
 			return nil, err
 		}
@@ -297,9 +375,12 @@ func (q *Queries) SelectPostsByTopicID(ctx context.Context, topicID uuid.UUID) (
 }
 
 const selectPostsByTopicIDPaginated = `-- name: SelectPostsByTopicIDPaginated :many
-SELECT id, account_id, topic_id, title, content, created_at, updated_at FROM posts
-WHERE topic_id = $1
-ORDER BY created_at DESC
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+WHERE p.topic_id = $1
+ORDER BY p.created_at DESC
 LIMIT $2
 OFFSET $3
 `
@@ -310,15 +391,27 @@ type SelectPostsByTopicIDPaginatedParams struct {
 	Offset  int32
 }
 
-func (q *Queries) SelectPostsByTopicIDPaginated(ctx context.Context, arg SelectPostsByTopicIDPaginatedParams) ([]Post, error) {
+type SelectPostsByTopicIDPaginatedRow struct {
+	ID              uuid.UUID
+	AccountID       uuid.UUID
+	TopicID         uuid.UUID
+	Title           string
+	Content         string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	AccountUsername string
+	TopicName       string
+}
+
+func (q *Queries) SelectPostsByTopicIDPaginated(ctx context.Context, arg SelectPostsByTopicIDPaginatedParams) ([]SelectPostsByTopicIDPaginatedRow, error) {
 	rows, err := q.db.Query(ctx, selectPostsByTopicIDPaginated, arg.TopicID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Post{}
+	items := []SelectPostsByTopicIDPaginatedRow{}
 	for rows.Next() {
-		var i Post
+		var i SelectPostsByTopicIDPaginatedRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.AccountID,
@@ -327,6 +420,8 @@ func (q *Queries) SelectPostsByTopicIDPaginated(ctx context.Context, arg SelectP
 			&i.Content,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.AccountUsername,
+			&i.TopicName,
 		); err != nil {
 			return nil, err
 		}

@@ -16,8 +16,8 @@ import (
 func (r *PostgresRepository) AddPost(ctx context.Context, p *post.Post) error {
 	arg := postgres.InsertPostParams{
 		ID:        p.ID,
-		AccountID: p.AccountID,
-		TopicID:   p.TopicID,
+		AccountID: p.Account.ID,
+		TopicID:   p.Topic.ID,
 		Title:     p.Title,
 		Content:   p.Content,
 		CreatedAt: p.CreatedAt,
@@ -70,95 +70,91 @@ func (r *PostgresRepository) GetPostByID(ctx context.Context, id uuid.UUID) (*po
 
 // ListPosts retrieves all posts data from postgres database.
 func (r *PostgresRepository) ListPosts(ctx context.Context, limit, page int32) ([]*post.Post, int64, error) {
-	var results []postgres.Post
-	var err error
-
-	offset := (page - 1) * limit
-	if limit == 0 {
-		results, err = r.db.SelectAllPosts(ctx)
-	} else {
-		results, err = r.db.SelectAllPostsPaginated(ctx, postgres.SelectAllPostsPaginatedParams{
-			Limit: limit, Offset: offset,
-		})
-	}
+	offset := calculateOffset(limit, page)
+	results, err := r.fetchAllPosts(ctx, limit, offset)
 	if err != nil {
 		return nil, 0, err
 	}
-
 	count, err := r.db.CountPosts(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
-
-	posts := make([]*post.Post, len(results))
-	for i, result := range results {
-		posts[i] = result.ToDomain()
+	posts, err := toPostDomain(results)
+	if err != nil {
+		return nil, 0, err
 	}
-
 	return posts, count, nil
+}
+
+// fetchAllPosts retrieves all posts data from postgres database.
+func (r *PostgresRepository) fetchAllPosts(ctx context.Context, limit, offset int32) (any, error) {
+	if limit == 0 {
+		return r.db.SelectAllPosts(ctx)
+	}
+	return r.db.SelectAllPostsPaginated(ctx, postgres.SelectAllPostsPaginatedParams{
+		Limit:  limit,
+		Offset: offset,
+	})
 }
 
 // ListPostsByTopicID retrieves all posts data from postgres database by topic ID.
 func (r *PostgresRepository) ListPostsByTopicID(
 	ctx context.Context, topicID uuid.UUID, limit, page int32,
 ) ([]*post.Post, int64, error) {
-	var results []postgres.Post
-	var err error
-
-	offset := (page - 1) * limit
-	if limit == 0 {
-		results, err = r.db.SelectPostsByTopicID(ctx, topicID)
-	} else {
-		results, err = r.db.SelectPostsByTopicIDPaginated(ctx, postgres.SelectPostsByTopicIDPaginatedParams{
-			TopicID: topicID, Limit: limit, Offset: offset,
-		})
-	}
+	offset := calculateOffset(limit, page)
+	results, err := r.fetchPostsByTopicID(ctx, topicID, limit, offset)
 	if err != nil {
 		return nil, 0, err
 	}
-
-	count, err := r.db.CountPostsByTopicID(ctx, topicID)
+	count, err := r.db.CountPosts(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
-
-	posts := make([]*post.Post, len(results))
-	for i, result := range results {
-		posts[i] = result.ToDomain()
+	posts, err := toPostDomain(results)
+	if err != nil {
+		return nil, 0, err
 	}
 	return posts, count, err
+}
+
+// fetchPostsByTopicID retrieves all posts data from postgres database by topic ID.
+func (r *PostgresRepository) fetchPostsByTopicID(ctx context.Context, topicID uuid.UUID, limit, offset int32) (any, error) {
+	if limit == 0 {
+		return r.db.SelectPostsByTopicID(ctx, topicID)
+	}
+	return r.db.SelectPostsByTopicIDPaginated(ctx, postgres.SelectPostsByTopicIDPaginatedParams{
+		TopicID: topicID, Limit: limit, Offset: offset,
+	})
 }
 
 // ListPostsByAccountID retrieves all posts data from postgres database by account ID.
 func (r *PostgresRepository) ListPostsByAccountID(
 	ctx context.Context, accountID uuid.UUID, limit, page int32,
 ) ([]*post.Post, int64, error) {
-	var results []postgres.Post
-	var err error
+	offset := calculateOffset(limit, page)
+	results, err := r.fetchPostsByAccountID(ctx, accountID, limit, offset)
+	if err != nil {
+		return nil, 0, err
+	}
+	count, err := r.db.CountPosts(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	posts, err := toPostDomain(results)
+	if err != nil {
+		return nil, 0, err
+	}
+	return posts, count, err
+}
 
-	offset := (page - 1) * limit
+// fetchPostsByAccountID retrieves all posts data from postgres database by account ID.
+func (r *PostgresRepository) fetchPostsByAccountID(ctx context.Context, accountID uuid.UUID, limit, offset int32) (any, error) {
 	if limit == 0 {
-		results, err = r.db.SelectPostsByAccountID(ctx, accountID)
-	} else {
-		results, err = r.db.SelectPostsByAccountIDPaginated(ctx, postgres.SelectPostsByAccountIDPaginatedParams{
-			AccountID: accountID, Limit: limit, Offset: offset,
-		})
+		return r.db.SelectPostsByAccountID(ctx, accountID)
 	}
-	if err != nil {
-		return nil, 0, err
-	}
-
-	count, err := r.db.CountPostsByAccountID(ctx, accountID)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	posts := make([]*post.Post, len(results))
-	for i, result := range results {
-		posts[i] = result.ToDomain()
-	}
-
-	return posts, count, nil
+	return r.db.SelectPostsByAccountIDPaginated(ctx, postgres.SelectPostsByAccountIDPaginatedParams{
+		AccountID: accountID, Limit: limit, Offset: offset,
+	})
 }
 
 // handlePostError handles post postgres repository errors and returns domain errors.

@@ -37,11 +37,169 @@ func (t Topic) ToDomain() *topic.Topic {
 }
 
 // ToDomain converts generated Post struct to domain post struct.
-func (p Post) ToDomain() *post.Post {
+func (p SelectPostByIDRow) ToDomain() *post.Post {
 	return &post.Post{
-		ID:        p.ID,
-		AccountID: p.AccountID,
-		TopicID:   p.TopicID,
+		ID: p.ID,
+		Account: &post.Account{
+			ID:       p.AccountID,
+			Username: p.AccountUsername,
+		},
+		Topic: &post.Topic{
+			ID:   p.TopicID,
+			Name: p.TopicName,
+		},
+		Title:     p.Title,
+		Content:   p.Content,
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+	}
+}
+
+// ToDomain converts generated Post struct to domain post struct.
+func (p SelectAllPostsRow) ToDomain() *post.Post {
+	return &post.Post{
+		ID: p.ID,
+		Account: &post.Account{
+			ID:       p.AccountID,
+			Username: p.AccountUsername,
+		},
+		Topic: &post.Topic{
+			ID:   p.TopicID,
+			Name: p.TopicName,
+		},
+		Title:     p.Title,
+		Content:   p.Content,
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+	}
+}
+
+// ToDomain converts generated Post struct to domain post struct.
+func (p SelectAllPostsPaginatedRow) ToDomain() *post.Post {
+	return &post.Post{
+		ID: p.ID,
+		Account: &post.Account{
+			ID:       p.AccountID,
+			Username: p.AccountUsername,
+		},
+		Topic: &post.Topic{
+			ID:   p.TopicID,
+			Name: p.TopicName,
+		},
+		Title:     p.Title,
+		Content:   p.Content,
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+	}
+}
+
+// ToDomain converts generated Post struct to domain post struct.
+func (p SelectPostsByAccountIDRow) ToDomain() *post.Post {
+	return &post.Post{
+		ID: p.ID,
+		Account: &post.Account{
+			ID:       p.AccountID,
+			Username: p.AccountUsername,
+		},
+		Topic: &post.Topic{
+			ID:   p.TopicID,
+			Name: p.TopicName,
+		},
+		Title:     p.Title,
+		Content:   p.Content,
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+	}
+}
+
+// ToDomain converts generated Post struct to domain post struct.
+func (p SelectPostsByAccountIDPaginatedRow) ToDomain() *post.Post {
+	return &post.Post{
+		ID: p.ID,
+		Account: &post.Account{
+			ID:       p.AccountID,
+			Username: p.AccountUsername,
+		},
+		Topic: &post.Topic{
+			ID:   p.TopicID,
+			Name: p.TopicName,
+		},
+		Title:     p.Title,
+		Content:   p.Content,
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+	}
+}
+
+// ToDomain converts generated Post struct to domain post struct.
+func (p SelectPostsByTopicIDRow) ToDomain() *post.Post {
+	return &post.Post{
+		ID: p.ID,
+		Account: &post.Account{
+			ID:       p.AccountID,
+			Username: p.AccountUsername,
+		},
+		Topic: &post.Topic{
+			ID:   p.TopicID,
+			Name: p.TopicName,
+		},
+		Title:     p.Title,
+		Content:   p.Content,
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+	}
+}
+
+// ToDomain converts generated Post struct to domain post struct.
+func (p SelectPostsByTopicIDPaginatedRow) ToDomain() *post.Post {
+	return &post.Post{
+		ID: p.ID,
+		Account: &post.Account{
+			ID:       p.AccountID,
+			Username: p.AccountUsername,
+		},
+		Topic: &post.Topic{
+			ID:   p.TopicID,
+			Name: p.TopicName,
+		},
+		Title:     p.Title,
+		Content:   p.Content,
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+	}
+}
+
+// ToDomain converts generated Post struct to domain post struct.
+func (p SelectBookmarksByAccountIDRow) ToDomain() *post.Post {
+	return &post.Post{
+		ID: p.ID,
+		Account: &post.Account{
+			ID:       p.AccountID,
+			Username: p.AccountUsername,
+		},
+		Topic: &post.Topic{
+			ID:   p.TopicID,
+			Name: p.TopicName,
+		},
+		Title:     p.Title,
+		Content:   p.Content,
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+	}
+}
+
+// ToDomain converts generated Post struct to domain post struct.
+func (p SelectBookmarksByAccountIDPaginatedRow) ToDomain() *post.Post {
+	return &post.Post{
+		ID: p.ID,
+		Account: &post.Account{
+			ID:       p.AccountID,
+			Username: p.AccountUsername,
+		},
+		Topic: &post.Topic{
+			ID:   p.TopicID,
+			Name: p.TopicName,
+		},
 		Title:     p.Title,
 		Content:   p.Content,
 		CreatedAt: p.CreatedAt,

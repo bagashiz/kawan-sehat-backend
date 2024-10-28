@@ -28,38 +28,35 @@ func (r *PostgresRepository) BookmarkPost(ctx context.Context, bookmark *post.Bo
 
 // ListAccountBookmarks retrieves all bookmarked posts data related by an account from postgres database.
 func (r *PostgresRepository) ListAccountBookmarks(
-	ctx context.Context,
-	accountID uuid.UUID,
-	limit, page int32,
+	ctx context.Context, accountID uuid.UUID, limit, page int32,
 ) ([]*post.Post, int64, error) {
-	var results []postgres.Post
-	var err error
+	offset := calculateOffset(limit, page)
+	results, err := r.fetchBookmarksByAccountID(ctx, accountID, limit, offset)
+	if err != nil {
+		return nil, 0, err
+	}
+	count, err := r.db.CountPosts(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	posts, err := toPostDomain(results)
+	if err != nil {
+		return nil, 0, err
+	}
+	return posts, count, err
+}
 
+// fetchBookmarksByAccountID retrieves all bookmark data from postgres database by account ID.
+func (r *PostgresRepository) fetchBookmarksByAccountID(
+	ctx context.Context, accountID uuid.UUID, limit, offset int32,
+) (any, error) {
 	if limit == 0 {
-		results, err = r.db.SelectBookmarksByAccountID(ctx, accountID)
-	} else {
-		results, err = r.db.SelectBookmarksByAccountIDPaginated(
-			ctx, postgres.SelectBookmarksByAccountIDPaginatedParams{
-				AccountID: accountID,
-				Limit:     limit,
-				Offset:    (page - 1) * limit,
-			})
+		return r.db.SelectBookmarksByAccountID(ctx, accountID)
 	}
-	if err != nil {
-		return nil, 0, err
-	}
-
-	count, err := r.db.CountAccountBookmarks(ctx, accountID)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	bookmarks := make([]*post.Post, len(results))
-	for i, result := range results {
-		bookmarks[i] = result.ToDomain()
-	}
-
-	return bookmarks, count, err
+	return r.db.SelectBookmarksByAccountIDPaginated(
+		ctx, postgres.SelectBookmarksByAccountIDPaginatedParams{
+			AccountID: accountID, Limit: limit, Offset: offset,
+		})
 }
 
 // UnbookmarkPost removes a bookmarked post from an account in postgres database.

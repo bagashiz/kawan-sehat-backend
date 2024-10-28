@@ -9,13 +9,25 @@ import (
 
 // postResponse holds the response data for the post object.
 type postResponse struct {
-	ID        string    `json:"id"`
-	AccountID string    `json:"account_id"`
-	TopicID   string    `json:"topic_id"`
-	Title     string    `json:"title"`
-	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        string               `json:"id"`
+	Account   *postAccountResponse `json:"account,omitempty"`
+	Topic     *postTopicResponse   `json:"topic,omitempty"`
+	Title     string               `json:"title"`
+	Content   string               `json:"content"`
+	CreatedAt time.Time            `json:"created_at"`
+	UpdatedAt time.Time            `json:"updated_at"`
+}
+
+// postTopicResponse holds the response data for the post account object.
+type postAccountResponse struct {
+	ID       string `json:"id,omitempty"`
+	Username string `json:"username,omitempty"`
+}
+
+// postTopicResponse holds the response data for the post topic object.
+type postTopicResponse struct {
+	ID   string `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 // createPostRequest holds the request data for the create post handler.
@@ -45,9 +57,15 @@ func (h *Handler) CreatePost() APIFunc {
 		}
 
 		res := &postResponse{
-			ID:        post.ID.String(),
-			AccountID: post.AccountID.String(),
-			TopicID:   post.TopicID.String(),
+			ID: post.ID.String(),
+			Account: &postAccountResponse{
+				ID:       post.Account.ID.String(),
+				Username: post.Account.Username,
+			},
+			Topic: &postTopicResponse{
+				ID:   post.Topic.ID.String(),
+				Name: post.Topic.Name,
+			},
 			Title:     post.Title,
 			Content:   post.Content,
 			CreatedAt: post.CreatedAt,
@@ -85,8 +103,6 @@ func (h *Handler) UpdatePost() APIFunc {
 
 		res := &postResponse{
 			ID:        post.ID.String(),
-			AccountID: post.AccountID.String(),
-			TopicID:   post.TopicID.String(),
 			Title:     post.Title,
 			Content:   post.Content,
 			CreatedAt: post.CreatedAt,
@@ -122,9 +138,15 @@ func (h *Handler) GetPostByID() APIFunc {
 		}
 
 		res := &postResponse{
-			ID:        post.ID.String(),
-			AccountID: post.AccountID.String(),
-			TopicID:   post.TopicID.String(),
+			ID: post.ID.String(),
+			Account: &postAccountResponse{
+				ID:       post.Account.ID.String(),
+				Username: post.Account.Username,
+			},
+			Topic: &postTopicResponse{
+				ID:   post.Topic.ID.String(),
+				Name: post.Topic.Name,
+			},
 			Title:     post.Title,
 			Content:   post.Content,
 			CreatedAt: post.CreatedAt,
@@ -137,10 +159,10 @@ func (h *Handler) GetPostByID() APIFunc {
 
 // listPostsResponse holds the response data for the list posts handler.
 type listPostsResponse struct {
-	Limit int32          `json:"limit"`
-	Page  int32          `json:"page"`
-	Count int64          `json:"count"`
-	Posts []postResponse `json:"posts"`
+	Limit int32           `json:"limit"`
+	Page  int32           `json:"page"`
+	Count int64           `json:"count"`
+	Posts []*postResponse `json:"posts"`
 }
 
 // ListPosts is the handler for the post list route.
@@ -162,12 +184,18 @@ func (h *Handler) ListPosts() APIFunc {
 			return handlePostError(err)
 		}
 
-		postsRes := make([]postResponse, len(posts))
+		postsRes := make([]*postResponse, len(posts))
 		for i, p := range posts {
-			postsRes[i] = postResponse{
-				ID:        p.ID.String(),
-				AccountID: p.AccountID.String(),
-				TopicID:   p.TopicID.String(),
+			postsRes[i] = &postResponse{
+				ID: p.ID.String(),
+				Account: &postAccountResponse{
+					ID:       p.Account.ID.String(),
+					Username: p.Account.Username,
+				},
+				Topic: &postTopicResponse{
+					ID:   p.Topic.ID.String(),
+					Name: p.Topic.Name,
+				},
 				Title:     p.Title,
 				Content:   p.Content,
 				CreatedAt: p.CreatedAt,
@@ -220,12 +248,18 @@ func (h *Handler) ListBookmarks() APIFunc {
 			return handlePostError(err)
 		}
 
-		postsRes := make([]postResponse, len(posts))
+		postsRes := make([]*postResponse, len(posts))
 		for i, p := range posts {
-			postsRes[i] = postResponse{
-				ID:        p.ID.String(),
-				AccountID: p.AccountID.String(),
-				TopicID:   p.TopicID.String(),
+			postsRes[i] = &postResponse{
+				ID: p.ID.String(),
+				Account: &postAccountResponse{
+					ID:       p.Account.ID.String(),
+					Username: p.Account.Username,
+				},
+				Topic: &postTopicResponse{
+					ID:   p.Topic.ID.String(),
+					Name: p.Topic.Name,
+				},
 				Title:     p.Title,
 				Content:   p.Content,
 				CreatedAt: p.CreatedAt,

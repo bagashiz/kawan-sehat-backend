@@ -6,52 +6,65 @@ INSERT INTO posts (
 );
 
 -- name: SelectPostByID :one
-SELECT * FROM posts
-WHERE id = $1
+SELECT p.*, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+WHERE p.id = $1
 LIMIT 1;
 
 -- name: CountPosts :one
 SELECT COUNT(id) FROM posts;
 
 -- name: SelectAllPosts :many
-SELECT * FROM posts
-ORDER BY created_at DESC;
+SELECT p.*, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+ORDER BY p.created_at DESC;
 
 -- name: SelectAllPostsPaginated :many
-SELECT * FROM posts
-ORDER BY created_at DESC
+SELECT p.*, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+ORDER BY p.created_at DESC
 LIMIT $1
 OFFSET $2;
 
--- name: CountPostsByAccountID :one
-SELECT COUNT(id) FROM posts
-WHERE account_id = $1;
-
 -- name: SelectPostsByAccountID :many
-SELECT * FROM posts
-WHERE account_id = $1
-ORDER BY created_at DESC;
+SELECT p.*, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+WHERE p.account_id = $1
+ORDER BY p.created_at DESC;
 
 -- name: SelectPostsByAccountIDPaginated :many
-SELECT * FROM posts
-WHERE account_id = $1
-ORDER BY created_at DESC
+SELECT p.*, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+WHERE p.account_id = $1
+ORDER BY p.created_at DESC
 LIMIT $2
 OFFSET $3;
 
--- name: CountPostsByTopicID :one
-SELECT COUNT(id) FROM posts
-WHERE topic_id = $1;
-
 -- name: SelectPostsByTopicID :many
-SELECT * FROM posts
-WHERE topic_id = $1
-ORDER BY created_at DESC;
+SELECT p.*, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+WHERE p.topic_id = $1
+ORDER BY p.created_at DESC;
 
 -- name: SelectPostsByTopicIDPaginated :many
-SELECT * FROM posts
-WHERE topic_id = $1
-ORDER BY created_at DESC
+SELECT p.*, a.username AS account_username, t.name AS topic_name
+FROM posts p
+JOIN accounts a ON p.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
+WHERE p.topic_id = $1
+ORDER BY p.created_at DESC
 LIMIT $2
 OFFSET $3;
 

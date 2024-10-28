@@ -62,21 +62,35 @@ func (q *Queries) InsertBookmark(ctx context.Context, arg InsertBookmarkParams) 
 }
 
 const selectBookmarksByAccountID = `-- name: SelectBookmarksByAccountID :many
-SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at FROM posts p
-JOIN bookmarks b
-ON p.id = b.post_id
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+FROM bookmarks b
+JOIN posts p ON b.post_id = p.id
+JOIN accounts a ON b.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
 WHERE b.account_id = $1
 `
 
-func (q *Queries) SelectBookmarksByAccountID(ctx context.Context, accountID uuid.UUID) ([]Post, error) {
+type SelectBookmarksByAccountIDRow struct {
+	ID              uuid.UUID
+	AccountID       uuid.UUID
+	TopicID         uuid.UUID
+	Title           string
+	Content         string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	AccountUsername string
+	TopicName       string
+}
+
+func (q *Queries) SelectBookmarksByAccountID(ctx context.Context, accountID uuid.UUID) ([]SelectBookmarksByAccountIDRow, error) {
 	rows, err := q.db.Query(ctx, selectBookmarksByAccountID, accountID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Post{}
+	items := []SelectBookmarksByAccountIDRow{}
 	for rows.Next() {
-		var i Post
+		var i SelectBookmarksByAccountIDRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.AccountID,
@@ -85,6 +99,8 @@ func (q *Queries) SelectBookmarksByAccountID(ctx context.Context, accountID uuid
 			&i.Content,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.AccountUsername,
+			&i.TopicName,
 		); err != nil {
 			return nil, err
 		}
@@ -97,9 +113,11 @@ func (q *Queries) SelectBookmarksByAccountID(ctx context.Context, accountID uuid
 }
 
 const selectBookmarksByAccountIDPaginated = `-- name: SelectBookmarksByAccountIDPaginated :many
-SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at FROM posts p
-JOIN bookmarks b
-ON p.id = b.post_id
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+FROM bookmarks b
+JOIN posts p ON b.post_id = p.id
+JOIN accounts a ON b.account_id = a.id
+JOIN topics t ON p.topic_id = t.id
 WHERE b.account_id = $1
 LIMIT $2 OFFSET $3
 `
@@ -110,15 +128,27 @@ type SelectBookmarksByAccountIDPaginatedParams struct {
 	Offset    int32
 }
 
-func (q *Queries) SelectBookmarksByAccountIDPaginated(ctx context.Context, arg SelectBookmarksByAccountIDPaginatedParams) ([]Post, error) {
+type SelectBookmarksByAccountIDPaginatedRow struct {
+	ID              uuid.UUID
+	AccountID       uuid.UUID
+	TopicID         uuid.UUID
+	Title           string
+	Content         string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	AccountUsername string
+	TopicName       string
+}
+
+func (q *Queries) SelectBookmarksByAccountIDPaginated(ctx context.Context, arg SelectBookmarksByAccountIDPaginatedParams) ([]SelectBookmarksByAccountIDPaginatedRow, error) {
 	rows, err := q.db.Query(ctx, selectBookmarksByAccountIDPaginated, arg.AccountID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Post{}
+	items := []SelectBookmarksByAccountIDPaginatedRow{}
 	for rows.Next() {
-		var i Post
+		var i SelectBookmarksByAccountIDPaginatedRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.AccountID,
@@ -127,6 +157,8 @@ func (q *Queries) SelectBookmarksByAccountIDPaginated(ctx context.Context, arg S
 			&i.Content,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.AccountUsername,
+			&i.TopicName,
 		); err != nil {
 			return nil, err
 		}
