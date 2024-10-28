@@ -14,6 +14,8 @@ type Querier interface {
 	CountAccountBookmarks(ctx context.Context, accountID uuid.UUID) (int64, error)
 	CountCommentsByPostID(ctx context.Context, postID uuid.UUID) (int64, error)
 	CountPosts(ctx context.Context) (int64, error)
+	CountPostsByAccountID(ctx context.Context, accountID uuid.UUID) (int64, error)
+	CountPostsByTopicID(ctx context.Context, topicID uuid.UUID) (int64, error)
 	CountTopics(ctx context.Context) (int64, error)
 	CountTopicsByAccountID(ctx context.Context, accountID uuid.UUID) (int64, error)
 	DeleteAccountTopic(ctx context.Context, arg DeleteAccountTopicParams) (int64, error)

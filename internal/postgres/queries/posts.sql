@@ -16,6 +16,14 @@ LIMIT 1;
 -- name: CountPosts :one
 SELECT COUNT(id) FROM posts;
 
+-- name: CountPostsByAccountID :one
+SELECT COUNT(id) FROM posts
+WHERE account_id = $1;
+
+-- name: CountPostsByTopicID :one
+SELECT COUNT(id) FROM posts
+WHERE topic_id = $1;
+
 -- name: SelectAllPosts :many
 SELECT p.*, a.username AS account_username, t.name AS topic_name
 FROM posts p

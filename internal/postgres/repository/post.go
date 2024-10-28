@@ -108,7 +108,7 @@ func (r *PostgresRepository) ListPostsByTopicID(
 	if err != nil {
 		return nil, 0, err
 	}
-	count, err := r.db.CountPosts(ctx)
+	count, err := r.db.CountPostsByTopicID(ctx, topicID)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -120,7 +120,9 @@ func (r *PostgresRepository) ListPostsByTopicID(
 }
 
 // fetchPostsByTopicID retrieves all posts data from postgres database by topic ID.
-func (r *PostgresRepository) fetchPostsByTopicID(ctx context.Context, topicID uuid.UUID, limit, offset int32) (any, error) {
+func (r *PostgresRepository) fetchPostsByTopicID(
+	ctx context.Context, topicID uuid.UUID, limit, offset int32,
+) (any, error) {
 	if limit == 0 {
 		return r.db.SelectPostsByTopicID(ctx, topicID)
 	}
@@ -138,7 +140,7 @@ func (r *PostgresRepository) ListPostsByAccountID(
 	if err != nil {
 		return nil, 0, err
 	}
-	count, err := r.db.CountPosts(ctx)
+	count, err := r.db.CountPostsByAccountID(ctx, accountID)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -150,7 +152,9 @@ func (r *PostgresRepository) ListPostsByAccountID(
 }
 
 // fetchPostsByAccountID retrieves all posts data from postgres database by account ID.
-func (r *PostgresRepository) fetchPostsByAccountID(ctx context.Context, accountID uuid.UUID, limit, offset int32) (any, error) {
+func (r *PostgresRepository) fetchPostsByAccountID(
+	ctx context.Context, accountID uuid.UUID, limit, offset int32,
+) (any, error) {
 	if limit == 0 {
 		return r.db.SelectPostsByAccountID(ctx, accountID)
 	}

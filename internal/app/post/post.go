@@ -17,11 +17,13 @@ type Post struct {
 	UpdatedAt time.Time
 }
 
+// Account represents a user account the post belongs to.
 type Account struct {
 	ID       uuid.UUID
 	Username string
 }
 
+// Topic represents a topic the post belongs to.
 type Topic struct {
 	ID   uuid.UUID
 	Name string

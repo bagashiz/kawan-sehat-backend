@@ -24,6 +24,30 @@ func (q *Queries) CountPosts(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+const countPostsByAccountID = `-- name: CountPostsByAccountID :one
+SELECT COUNT(id) FROM posts
+WHERE account_id = $1
+`
+
+func (q *Queries) CountPostsByAccountID(ctx context.Context, accountID uuid.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, countPostsByAccountID, accountID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countPostsByTopicID = `-- name: CountPostsByTopicID :one
+SELECT COUNT(id) FROM posts
+WHERE topic_id = $1
+`
+
+func (q *Queries) CountPostsByTopicID(ctx context.Context, topicID uuid.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, countPostsByTopicID, topicID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const deletePost = `-- name: DeletePost :execrows
 DELETE FROM posts
 WHERE id = $1
