@@ -12,18 +12,28 @@ import (
 
 type Querier interface {
 	DeleteAccountTopic(ctx context.Context, arg DeleteAccountTopicParams) (int64, error)
+	DeletePost(ctx context.Context, id uuid.UUID) (int64, error)
 	DeleteTopic(ctx context.Context, id uuid.UUID) (int64, error)
 	InsertAccount(ctx context.Context, arg InsertAccountParams) error
 	InsertAccountTopic(ctx context.Context, arg InsertAccountTopicParams) error
+	InsertPost(ctx context.Context, arg InsertPostParams) error
 	InsertTopic(ctx context.Context, arg InsertTopicParams) error
 	SelectAccountByID(ctx context.Context, id uuid.UUID) (Account, error)
 	SelectAccountByUsername(ctx context.Context, username string) (Account, error)
+	SelectAllPosts(ctx context.Context) ([]Post, error)
+	SelectAllPostsPaginated(ctx context.Context, arg SelectAllPostsPaginatedParams) ([]Post, error)
 	SelectAllTopics(ctx context.Context) ([]Topic, error)
 	SelectAllTopicsPaginated(ctx context.Context, arg SelectAllTopicsPaginatedParams) ([]Topic, error)
+	SelectPostByID(ctx context.Context, id uuid.UUID) (Post, error)
+	SelectPostsByAccountID(ctx context.Context, accountID uuid.UUID) ([]Post, error)
+	SelectPostsByAccountIDPaginated(ctx context.Context, arg SelectPostsByAccountIDPaginatedParams) ([]Post, error)
+	SelectPostsByTopicID(ctx context.Context, topicID uuid.UUID) ([]Post, error)
+	SelectPostsByTopicIDPaginated(ctx context.Context, arg SelectPostsByTopicIDPaginatedParams) ([]Post, error)
 	SelectTopicByID(ctx context.Context, id uuid.UUID) (Topic, error)
 	SelectTopicsByAccountID(ctx context.Context, accountID uuid.UUID) ([]Topic, error)
 	SelectTopicsByAccountIDPaginated(ctx context.Context, arg SelectTopicsByAccountIDPaginatedParams) ([]Topic, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) error
+	UpdatePost(ctx context.Context, arg UpdatePostParams) error
 	UpdateTopic(ctx context.Context, arg UpdateTopicParams) error
 }
 

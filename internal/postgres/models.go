@@ -165,6 +165,16 @@ type AccountTopic struct {
 	CreatedAt time.Time
 }
 
+type Post struct {
+	ID        uuid.UUID
+	AccountID uuid.UUID
+	TopicID   uuid.UUID
+	Title     string
+	Content   string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 type Topic struct {
 	ID          uuid.UUID
 	Name        string
