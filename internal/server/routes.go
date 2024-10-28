@@ -75,8 +75,8 @@ func postRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 		mux.Put("/{id}", handle(auth(h.UpdatePost())))
 		mux.Delete("/{id}", handle(auth(h.DeletePost())))
 		mux.Delete("/{id}/unmark", handle(auth(h.Unbookmark())))
-		mux.Get("/{id}", handle(h.GetPostByID()))
-		mux.Get("/", handle(h.ListPosts()))
+		mux.Get("/{id}", handle(auth(h.GetPostByID())))
+		mux.Get("/", handle(auth(h.ListPosts())))
 		mux.Get("/{id}/comments", handle(auth(h.ListCommentsByPostID())))
 	})
 	return mux

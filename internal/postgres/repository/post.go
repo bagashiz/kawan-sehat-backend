@@ -58,8 +58,10 @@ func (r *PostgresRepository) DeletePost(ctx context.Context, id uuid.UUID) error
 }
 
 // GetPostByID retrieves post data from postgres database by ID.
-func (r *PostgresRepository) GetPostByID(ctx context.Context, id uuid.UUID) (*post.Post, error) {
-	result, err := r.db.SelectPostByID(ctx, id)
+func (r *PostgresRepository) GetPostByID(ctx context.Context, accountID, postID uuid.UUID) (*post.Post, error) {
+	result, err := r.db.SelectPostByID(ctx, postgres.SelectPostByIDParams{
+		AccountID: accountID, ID: postID,
+	})
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return nil, post.ErrPostNotFound
@@ -71,9 +73,9 @@ func (r *PostgresRepository) GetPostByID(ctx context.Context, id uuid.UUID) (*po
 }
 
 // ListPosts retrieves all posts data from postgres database.
-func (r *PostgresRepository) ListPosts(ctx context.Context, limit, page int32) ([]*post.Post, int64, error) {
+func (r *PostgresRepository) ListPosts(ctx context.Context, accountID uuid.UUID, limit, page int32) ([]*post.Post, int64, error) {
 	offset := calculateOffset(limit, page)
-	results, err := r.fetchAllPosts(ctx, limit, offset)
+	results, err := r.fetchAllPosts(ctx, accountID, limit, offset)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -89,22 +91,23 @@ func (r *PostgresRepository) ListPosts(ctx context.Context, limit, page int32) (
 }
 
 // fetchAllPosts retrieves all posts data from postgres database.
-func (r *PostgresRepository) fetchAllPosts(ctx context.Context, limit, offset int32) (any, error) {
+func (r *PostgresRepository) fetchAllPosts(ctx context.Context, accountID uuid.UUID, limit, offset int32) (any, error) {
 	if limit == 0 {
-		return r.db.SelectAllPosts(ctx)
+		return r.db.SelectAllPosts(ctx, accountID)
 	}
 	return r.db.SelectAllPostsPaginated(ctx, postgres.SelectAllPostsPaginatedParams{
-		Limit:  limit,
-		Offset: offset,
+		AccountID: accountID,
+		Limit:     limit,
+		Offset:    offset,
 	})
 }
 
 // ListPostsByTopicID retrieves all posts data from postgres database by topic ID.
 func (r *PostgresRepository) ListPostsByTopicID(
-	ctx context.Context, topicID uuid.UUID, limit, page int32,
+	ctx context.Context, accountID, topicID uuid.UUID, limit, page int32,
 ) ([]*post.Post, int64, error) {
 	offset := calculateOffset(limit, page)
-	results, err := r.fetchPostsByTopicID(ctx, topicID, limit, offset)
+	results, err := r.fetchPostsByTopicID(ctx, accountID, topicID, limit, offset)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -121,10 +124,12 @@ func (r *PostgresRepository) ListPostsByTopicID(
 
 // fetchPostsByTopicID retrieves all posts data from postgres database by topic ID.
 func (r *PostgresRepository) fetchPostsByTopicID(
-	ctx context.Context, topicID uuid.UUID, limit, offset int32,
+	ctx context.Context, accountID, topicID uuid.UUID, limit, offset int32,
 ) (any, error) {
 	if limit == 0 {
-		return r.db.SelectPostsByTopicID(ctx, topicID)
+		return r.db.SelectPostsByTopicID(ctx, postgres.SelectPostsByTopicIDParams{
+			AccountID: accountID, TopicID: topicID,
+		})
 	}
 	return r.db.SelectPostsByTopicIDPaginated(ctx, postgres.SelectPostsByTopicIDPaginatedParams{
 		TopicID: topicID, Limit: limit, Offset: offset,

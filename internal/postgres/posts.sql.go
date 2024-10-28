@@ -93,7 +93,11 @@ func (q *Queries) InsertPost(ctx context.Context, arg InsertPostParams) error {
 }
 
 const selectAllPosts = `-- name: SelectAllPosts :many
-SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
+  a.username AS account_username, t.name AS topic_name,
+  (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
+  (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -110,10 +114,13 @@ type SelectAllPostsRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	TopicName       string
+	TotalComments   int64
+	TotalVotes      interface{}
+	VoteState       interface{}
 }
 
-func (q *Queries) SelectAllPosts(ctx context.Context) ([]SelectAllPostsRow, error) {
-	rows, err := q.db.Query(ctx, selectAllPosts)
+func (q *Queries) SelectAllPosts(ctx context.Context, accountID uuid.UUID) ([]SelectAllPostsRow, error) {
+	rows, err := q.db.Query(ctx, selectAllPosts, accountID)
 	if err != nil {
 		return nil, err
 	}
@@ -131,6 +138,9 @@ func (q *Queries) SelectAllPosts(ctx context.Context) ([]SelectAllPostsRow, erro
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.TopicName,
+			&i.TotalComments,
+			&i.TotalVotes,
+			&i.VoteState,
 		); err != nil {
 			return nil, err
 		}
@@ -143,18 +153,23 @@ func (q *Queries) SelectAllPosts(ctx context.Context) ([]SelectAllPostsRow, erro
 }
 
 const selectAllPostsPaginated = `-- name: SelectAllPostsPaginated :many
-SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
+  a.username AS account_username, t.name AS topic_name,
+  (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
+  (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
 ORDER BY p.created_at DESC
-LIMIT $1
-OFFSET $2
+LIMIT $2
+OFFSET $3
 `
 
 type SelectAllPostsPaginatedParams struct {
-	Limit  int32
-	Offset int32
+	AccountID uuid.UUID
+	Limit     int32
+	Offset    int32
 }
 
 type SelectAllPostsPaginatedRow struct {
@@ -167,10 +182,13 @@ type SelectAllPostsPaginatedRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	TopicName       string
+	TotalComments   int64
+	TotalVotes      interface{}
+	VoteState       interface{}
 }
 
 func (q *Queries) SelectAllPostsPaginated(ctx context.Context, arg SelectAllPostsPaginatedParams) ([]SelectAllPostsPaginatedRow, error) {
-	rows, err := q.db.Query(ctx, selectAllPostsPaginated, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, selectAllPostsPaginated, arg.AccountID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -188,6 +206,9 @@ func (q *Queries) SelectAllPostsPaginated(ctx context.Context, arg SelectAllPost
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.TopicName,
+			&i.TotalComments,
+			&i.TotalVotes,
+			&i.VoteState,
 		); err != nil {
 			return nil, err
 		}
@@ -200,13 +221,22 @@ func (q *Queries) SelectAllPostsPaginated(ctx context.Context, arg SelectAllPost
 }
 
 const selectPostByID = `-- name: SelectPostByID :one
-SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
+  a.username AS account_username, t.name AS topic_name,
+  (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
+  (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
-WHERE p.id = $1
+WHERE p.id = $2
 LIMIT 1
 `
+
+type SelectPostByIDParams struct {
+	AccountID uuid.UUID
+	ID        uuid.UUID
+}
 
 type SelectPostByIDRow struct {
 	ID              uuid.UUID
@@ -218,10 +248,13 @@ type SelectPostByIDRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	TopicName       string
+	TotalComments   int64
+	TotalVotes      interface{}
+	VoteState       interface{}
 }
 
-func (q *Queries) SelectPostByID(ctx context.Context, id uuid.UUID) (SelectPostByIDRow, error) {
-	row := q.db.QueryRow(ctx, selectPostByID, id)
+func (q *Queries) SelectPostByID(ctx context.Context, arg SelectPostByIDParams) (SelectPostByIDRow, error) {
+	row := q.db.QueryRow(ctx, selectPostByID, arg.AccountID, arg.ID)
 	var i SelectPostByIDRow
 	err := row.Scan(
 		&i.ID,
@@ -233,12 +266,19 @@ func (q *Queries) SelectPostByID(ctx context.Context, id uuid.UUID) (SelectPostB
 		&i.UpdatedAt,
 		&i.AccountUsername,
 		&i.TopicName,
+		&i.TotalComments,
+		&i.TotalVotes,
+		&i.VoteState,
 	)
 	return i, err
 }
 
 const selectPostsByAccountID = `-- name: SelectPostsByAccountID :many
-SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
+  a.username AS account_username, t.name AS topic_name,
+  (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
+  (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -256,6 +296,9 @@ type SelectPostsByAccountIDRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	TopicName       string
+	TotalComments   int64
+	TotalVotes      interface{}
+	VoteState       interface{}
 }
 
 func (q *Queries) SelectPostsByAccountID(ctx context.Context, accountID uuid.UUID) ([]SelectPostsByAccountIDRow, error) {
@@ -277,6 +320,9 @@ func (q *Queries) SelectPostsByAccountID(ctx context.Context, accountID uuid.UUI
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.TopicName,
+			&i.TotalComments,
+			&i.TotalVotes,
+			&i.VoteState,
 		); err != nil {
 			return nil, err
 		}
@@ -289,7 +335,11 @@ func (q *Queries) SelectPostsByAccountID(ctx context.Context, accountID uuid.UUI
 }
 
 const selectPostsByAccountIDPaginated = `-- name: SelectPostsByAccountIDPaginated :many
-SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
+  a.username AS account_username, t.name AS topic_name,
+  (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
+  (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -315,6 +365,9 @@ type SelectPostsByAccountIDPaginatedRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	TopicName       string
+	TotalComments   int64
+	TotalVotes      interface{}
+	VoteState       interface{}
 }
 
 func (q *Queries) SelectPostsByAccountIDPaginated(ctx context.Context, arg SelectPostsByAccountIDPaginatedParams) ([]SelectPostsByAccountIDPaginatedRow, error) {
@@ -336,6 +389,9 @@ func (q *Queries) SelectPostsByAccountIDPaginated(ctx context.Context, arg Selec
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.TopicName,
+			&i.TotalComments,
+			&i.TotalVotes,
+			&i.VoteState,
 		); err != nil {
 			return nil, err
 		}
@@ -348,13 +404,22 @@ func (q *Queries) SelectPostsByAccountIDPaginated(ctx context.Context, arg Selec
 }
 
 const selectPostsByTopicID = `-- name: SelectPostsByTopicID :many
-SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
+  a.username AS account_username, t.name AS topic_name,
+  (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
+  (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
-WHERE p.topic_id = $1
+WHERE p.topic_id = $2
 ORDER BY p.created_at DESC
 `
+
+type SelectPostsByTopicIDParams struct {
+	AccountID uuid.UUID
+	TopicID   uuid.UUID
+}
 
 type SelectPostsByTopicIDRow struct {
 	ID              uuid.UUID
@@ -366,10 +431,13 @@ type SelectPostsByTopicIDRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	TopicName       string
+	TotalComments   int64
+	TotalVotes      interface{}
+	VoteState       interface{}
 }
 
-func (q *Queries) SelectPostsByTopicID(ctx context.Context, topicID uuid.UUID) ([]SelectPostsByTopicIDRow, error) {
-	rows, err := q.db.Query(ctx, selectPostsByTopicID, topicID)
+func (q *Queries) SelectPostsByTopicID(ctx context.Context, arg SelectPostsByTopicIDParams) ([]SelectPostsByTopicIDRow, error) {
+	rows, err := q.db.Query(ctx, selectPostsByTopicID, arg.AccountID, arg.TopicID)
 	if err != nil {
 		return nil, err
 	}
@@ -387,6 +455,9 @@ func (q *Queries) SelectPostsByTopicID(ctx context.Context, topicID uuid.UUID) (
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.TopicName,
+			&i.TotalComments,
+			&i.TotalVotes,
+			&i.VoteState,
 		); err != nil {
 			return nil, err
 		}
@@ -399,20 +470,25 @@ func (q *Queries) SelectPostsByTopicID(ctx context.Context, topicID uuid.UUID) (
 }
 
 const selectPostsByTopicIDPaginated = `-- name: SelectPostsByTopicIDPaginated :many
-SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
+  a.username AS account_username, t.name AS topic_name,
+  (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
+  (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
-WHERE p.topic_id = $1
+WHERE p.topic_id = $2
 ORDER BY p.created_at DESC
-LIMIT $2
-OFFSET $3
+LIMIT $3
+OFFSET $4
 `
 
 type SelectPostsByTopicIDPaginatedParams struct {
-	TopicID uuid.UUID
-	Limit   int32
-	Offset  int32
+	AccountID uuid.UUID
+	TopicID   uuid.UUID
+	Limit     int32
+	Offset    int32
 }
 
 type SelectPostsByTopicIDPaginatedRow struct {
@@ -425,10 +501,18 @@ type SelectPostsByTopicIDPaginatedRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	TopicName       string
+	TotalComments   int64
+	TotalVotes      interface{}
+	VoteState       interface{}
 }
 
 func (q *Queries) SelectPostsByTopicIDPaginated(ctx context.Context, arg SelectPostsByTopicIDPaginatedParams) ([]SelectPostsByTopicIDPaginatedRow, error) {
-	rows, err := q.db.Query(ctx, selectPostsByTopicIDPaginated, arg.TopicID, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, selectPostsByTopicIDPaginated,
+		arg.AccountID,
+		arg.TopicID,
+		arg.Limit,
+		arg.Offset,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -446,6 +530,9 @@ func (q *Queries) SelectPostsByTopicIDPaginated(ctx context.Context, arg SelectP
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.TopicName,
+			&i.TotalComments,
+			&i.TotalVotes,
+			&i.VoteState,
 		); err != nil {
 			return nil, err
 		}

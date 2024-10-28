@@ -9,13 +9,15 @@ import (
 
 // postResponse holds the response data for the post object.
 type postResponse struct {
-	ID        string               `json:"id"`
-	Account   *postAccountResponse `json:"account,omitempty"`
-	Topic     *postTopicResponse   `json:"topic,omitempty"`
-	Title     string               `json:"title"`
-	Content   string               `json:"content"`
-	CreatedAt time.Time            `json:"created_at"`
-	UpdatedAt time.Time            `json:"updated_at"`
+	ID            string               `json:"id"`
+	Account       *postAccountResponse `json:"account,omitempty"`
+	Topic         *postTopicResponse   `json:"topic,omitempty"`
+	Vote          *postVoteResponse    `json:"vote,omitempty"`
+	TotalComments int64                `json:"total_comments"`
+	Title         string               `json:"title"`
+	Content       string               `json:"content"`
+	CreatedAt     time.Time            `json:"created_at"`
+	UpdatedAt     time.Time            `json:"updated_at"`
 }
 
 // postTopicResponse holds the response data for the post account object.
@@ -28,6 +30,12 @@ type postAccountResponse struct {
 type postTopicResponse struct {
 	ID   string `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
+}
+
+// postVoteResponse holds the response data for the comment vote object.
+type postVoteResponse struct {
+	Total int64 `json:"total"`
+	State int32 `json:"state"`
 }
 
 // createPostRequest holds the request data for the create post handler.
@@ -66,10 +74,15 @@ func (h *Handler) CreatePost() APIFunc {
 				ID:   post.Topic.ID.String(),
 				Name: post.Topic.Name,
 			},
-			Title:     post.Title,
-			Content:   post.Content,
-			CreatedAt: post.CreatedAt,
-			UpdatedAt: post.UpdatedAt,
+			Vote: &postVoteResponse{
+				Total: post.Vote.Total,
+				State: post.Vote.State,
+			},
+			TotalComments: post.TotalComments,
+			Title:         post.Title,
+			Content:       post.Content,
+			CreatedAt:     post.CreatedAt,
+			UpdatedAt:     post.UpdatedAt,
 		}
 		return writeJSON(w, http.StatusCreated, res, nil)
 	}
@@ -102,11 +115,24 @@ func (h *Handler) UpdatePost() APIFunc {
 		}
 
 		res := &postResponse{
-			ID:        post.ID.String(),
-			Title:     post.Title,
-			Content:   post.Content,
-			CreatedAt: post.CreatedAt,
-			UpdatedAt: post.UpdatedAt,
+			ID: post.ID.String(),
+			Account: &postAccountResponse{
+				ID:       post.Account.ID.String(),
+				Username: post.Account.Username,
+			},
+			Topic: &postTopicResponse{
+				ID:   post.Topic.ID.String(),
+				Name: post.Topic.Name,
+			},
+			Vote: &postVoteResponse{
+				Total: post.Vote.Total,
+				State: post.Vote.State,
+			},
+			TotalComments: post.TotalComments,
+			Title:         post.Title,
+			Content:       post.Content,
+			CreatedAt:     post.CreatedAt,
+			UpdatedAt:     post.UpdatedAt,
 		}
 
 		return writeJSON(w, http.StatusOK, res, nil)
@@ -147,10 +173,15 @@ func (h *Handler) GetPostByID() APIFunc {
 				ID:   post.Topic.ID.String(),
 				Name: post.Topic.Name,
 			},
-			Title:     post.Title,
-			Content:   post.Content,
-			CreatedAt: post.CreatedAt,
-			UpdatedAt: post.UpdatedAt,
+			Vote: &postVoteResponse{
+				Total: post.Vote.Total,
+				State: post.Vote.State,
+			},
+			TotalComments: post.TotalComments,
+			Title:         post.Title,
+			Content:       post.Content,
+			CreatedAt:     post.CreatedAt,
+			UpdatedAt:     post.UpdatedAt,
 		}
 
 		return writeJSON(w, http.StatusOK, res, nil)
@@ -185,21 +216,26 @@ func (h *Handler) ListPosts() APIFunc {
 		}
 
 		postsRes := make([]*postResponse, len(posts))
-		for i, p := range posts {
+		for i, post := range posts {
 			postsRes[i] = &postResponse{
-				ID: p.ID.String(),
+				ID: post.ID.String(),
 				Account: &postAccountResponse{
-					ID:       p.Account.ID.String(),
-					Username: p.Account.Username,
+					ID:       post.Account.ID.String(),
+					Username: post.Account.Username,
 				},
 				Topic: &postTopicResponse{
-					ID:   p.Topic.ID.String(),
-					Name: p.Topic.Name,
+					ID:   post.Topic.ID.String(),
+					Name: post.Topic.Name,
 				},
-				Title:     p.Title,
-				Content:   p.Content,
-				CreatedAt: p.CreatedAt,
-				UpdatedAt: p.UpdatedAt,
+				Vote: &postVoteResponse{
+					Total: post.Vote.Total,
+					State: post.Vote.State,
+				},
+				TotalComments: post.TotalComments,
+				Title:         post.Title,
+				Content:       post.Content,
+				CreatedAt:     post.CreatedAt,
+				UpdatedAt:     post.UpdatedAt,
 			}
 		}
 
@@ -249,21 +285,26 @@ func (h *Handler) ListBookmarks() APIFunc {
 		}
 
 		postsRes := make([]*postResponse, len(posts))
-		for i, p := range posts {
+		for i, post := range posts {
 			postsRes[i] = &postResponse{
-				ID: p.ID.String(),
+				ID: post.ID.String(),
 				Account: &postAccountResponse{
-					ID:       p.Account.ID.String(),
-					Username: p.Account.Username,
+					ID:       post.Account.ID.String(),
+					Username: post.Account.Username,
 				},
 				Topic: &postTopicResponse{
-					ID:   p.Topic.ID.String(),
-					Name: p.Topic.Name,
+					ID:   post.Topic.ID.String(),
+					Name: post.Topic.Name,
 				},
-				Title:     p.Title,
-				Content:   p.Content,
-				CreatedAt: p.CreatedAt,
-				UpdatedAt: p.UpdatedAt,
+				Vote: &postVoteResponse{
+					Total: post.Vote.Total,
+					State: post.Vote.State,
+				},
+				TotalComments: post.TotalComments,
+				Title:         post.Title,
+				Content:       post.Content,
+				CreatedAt:     post.CreatedAt,
+				UpdatedAt:     post.UpdatedAt,
 			}
 		}
 

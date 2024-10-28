@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/comment"
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/post"
 	"github.com/bagashiz/kawan-sehat-backend/internal/postgres"
 	"github.com/google/uuid"
 	"github.com/jackc/pgerrcode"
@@ -97,6 +98,13 @@ func handleCommentError(err error) error {
 		switch {
 		case pgerrcode.IsDataException(pgErr.Code):
 			return comment.ErrCommentInvalid
+		case pgerrcode.IsIntegrityConstraintViolation(pgErr.Code):
+			switch pgErr.ConstraintName {
+			case "comments_post_id_fkey":
+				return post.ErrPostNotFound
+			default:
+				return err
+			}
 		default:
 			return err
 		}

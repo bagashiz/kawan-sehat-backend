@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/comment"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/reply"
 	"github.com/bagashiz/kawan-sehat-backend/internal/postgres"
 	"github.com/google/uuid"
@@ -97,6 +98,13 @@ func handleReplyError(err error) error {
 		switch {
 		case pgerrcode.IsDataException(pgErr.Code):
 			return reply.ErrReplyInvalid
+		case pgerrcode.IsIntegrityConstraintViolation(pgErr.Code):
+			switch pgErr.ConstraintName {
+			case "replies_comment_id_fkey":
+				return comment.ErrCommentNotFound
+			default:
+				return err
+			}
 		default:
 			return err
 		}

@@ -50,10 +50,15 @@ func (p SelectPostByIDRow) ToDomain() *post.Post {
 			ID:   p.TopicID,
 			Name: p.TopicName,
 		},
-		Title:     p.Title,
-		Content:   p.Content,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		Vote: &post.Vote{
+			Total: p.TotalVotes.(int64),
+			State: p.VoteState.(int32),
+		},
+		TotalComments: p.TotalComments,
+		Title:         p.Title,
+		Content:       p.Content,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
 	}
 }
 
@@ -69,10 +74,15 @@ func (p SelectAllPostsRow) ToDomain() *post.Post {
 			ID:   p.TopicID,
 			Name: p.TopicName,
 		},
-		Title:     p.Title,
-		Content:   p.Content,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		Vote: &post.Vote{
+			Total: p.TotalVotes.(int64),
+			State: p.VoteState.(int32),
+		},
+		TotalComments: p.TotalComments,
+		Title:         p.Title,
+		Content:       p.Content,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
 	}
 }
 
@@ -88,10 +98,15 @@ func (p SelectAllPostsPaginatedRow) ToDomain() *post.Post {
 			ID:   p.TopicID,
 			Name: p.TopicName,
 		},
-		Title:     p.Title,
-		Content:   p.Content,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		Vote: &post.Vote{
+			Total: p.TotalVotes.(int64),
+			State: p.VoteState.(int32),
+		},
+		TotalComments: p.TotalComments,
+		Title:         p.Title,
+		Content:       p.Content,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
 	}
 }
 
@@ -107,10 +122,15 @@ func (p SelectPostsByAccountIDRow) ToDomain() *post.Post {
 			ID:   p.TopicID,
 			Name: p.TopicName,
 		},
-		Title:     p.Title,
-		Content:   p.Content,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		Vote: &post.Vote{
+			Total: p.TotalVotes.(int64),
+			State: p.VoteState.(int32),
+		},
+		TotalComments: p.TotalComments,
+		Title:         p.Title,
+		Content:       p.Content,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
 	}
 }
 
@@ -126,10 +146,15 @@ func (p SelectPostsByAccountIDPaginatedRow) ToDomain() *post.Post {
 			ID:   p.TopicID,
 			Name: p.TopicName,
 		},
-		Title:     p.Title,
-		Content:   p.Content,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		Vote: &post.Vote{
+			Total: p.TotalVotes.(int64),
+			State: p.VoteState.(int32),
+		},
+		TotalComments: p.TotalComments,
+		Title:         p.Title,
+		Content:       p.Content,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
 	}
 }
 
@@ -145,10 +170,15 @@ func (p SelectPostsByTopicIDRow) ToDomain() *post.Post {
 			ID:   p.TopicID,
 			Name: p.TopicName,
 		},
-		Title:     p.Title,
-		Content:   p.Content,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		Vote: &post.Vote{
+			Total: p.TotalVotes.(int64),
+			State: p.VoteState.(int32),
+		},
+		TotalComments: p.TotalComments,
+		Title:         p.Title,
+		Content:       p.Content,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
 	}
 }
 
@@ -164,10 +194,15 @@ func (p SelectPostsByTopicIDPaginatedRow) ToDomain() *post.Post {
 			ID:   p.TopicID,
 			Name: p.TopicName,
 		},
-		Title:     p.Title,
-		Content:   p.Content,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		Vote: &post.Vote{
+			Total: p.TotalVotes.(int64),
+			State: p.VoteState.(int32),
+		},
+		TotalComments: p.TotalComments,
+		Title:         p.Title,
+		Content:       p.Content,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
 	}
 }
 
@@ -183,10 +218,15 @@ func (p SelectBookmarksByAccountIDRow) ToDomain() *post.Post {
 			ID:   p.TopicID,
 			Name: p.TopicName,
 		},
-		Title:     p.Title,
-		Content:   p.Content,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		Vote: &post.Vote{
+			Total: p.TotalVotes.(int64),
+			State: p.VoteState.(int32),
+		},
+		TotalComments: p.TotalComments,
+		Title:         p.Title,
+		Content:       p.Content,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
 	}
 }
 
@@ -202,10 +242,15 @@ func (p SelectBookmarksByAccountIDPaginatedRow) ToDomain() *post.Post {
 			ID:   p.TopicID,
 			Name: p.TopicName,
 		},
-		Title:     p.Title,
-		Content:   p.Content,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		Vote: &post.Vote{
+			Total: p.TotalVotes.(int64),
+			State: p.VoteState.(int32),
+		},
+		TotalComments: p.TotalComments,
+		Title:         p.Title,
+		Content:       p.Content,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
 	}
 }
 

@@ -50,7 +50,7 @@ func (s *Service) UpdatePost(ctx context.Context, params UpdatePostParams) (*Pos
 	if err != nil {
 		return nil, err
 	}
-	post, err := s.repo.GetPostByID(ctx, uuid)
+	post, err := s.repo.GetPostByID(ctx, tokenPayload.AccountID, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (s *Service) DeletePost(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	post, err := s.repo.GetPostByID(ctx, uuid)
+	post, err := s.repo.GetPostByID(ctx, tokenPayload.AccountID, uuid)
 	if err != nil {
 		return err
 	}

@@ -8,9 +8,9 @@ import (
 
 // Reader is the interface that provides methods to read post data from the storage.
 type Reader interface {
-	GetPostByID(ctx context.Context, id uuid.UUID) (*Post, error)
-	ListPosts(ctx context.Context, limit, page int32) ([]*Post, int64, error)
-	ListPostsByTopicID(ctx context.Context, topicID uuid.UUID, limit, page int32) ([]*Post, int64, error)
+	GetPostByID(ctx context.Context, accountID, postID uuid.UUID) (*Post, error)
+	ListPosts(ctx context.Context, accountID uuid.UUID, limit, page int32) ([]*Post, int64, error)
+	ListPostsByTopicID(ctx context.Context, accountID, topicID uuid.UUID, limit, page int32) ([]*Post, int64, error)
 	ListPostsByAccountID(ctx context.Context, accountID uuid.UUID, limit, page int32) ([]*Post, int64, error)
 	ListAccountBookmarks(ctx context.Context, accountID uuid.UUID, limit, page int32) ([]*Post, int64, error)
 }

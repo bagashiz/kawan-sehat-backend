@@ -62,10 +62,15 @@ func (q *Queries) InsertBookmark(ctx context.Context, arg InsertBookmarkParams) 
 }
 
 const selectBookmarksByAccountID = `-- name: SelectBookmarksByAccountID :many
-SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, 
+  a.username AS account_username, 
+  t.name AS topic_name,
+  (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
+  (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
 FROM bookmarks b
 JOIN posts p ON b.post_id = p.id
-JOIN accounts a ON b.account_id = a.id
+JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
 WHERE b.account_id = $1
 `
@@ -80,6 +85,9 @@ type SelectBookmarksByAccountIDRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	TopicName       string
+	TotalComments   int64
+	TotalVotes      interface{}
+	VoteState       interface{}
 }
 
 func (q *Queries) SelectBookmarksByAccountID(ctx context.Context, accountID uuid.UUID) ([]SelectBookmarksByAccountIDRow, error) {
@@ -101,6 +109,9 @@ func (q *Queries) SelectBookmarksByAccountID(ctx context.Context, accountID uuid
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.TopicName,
+			&i.TotalComments,
+			&i.TotalVotes,
+			&i.VoteState,
 		); err != nil {
 			return nil, err
 		}
@@ -113,10 +124,15 @@ func (q *Queries) SelectBookmarksByAccountID(ctx context.Context, accountID uuid
 }
 
 const selectBookmarksByAccountIDPaginated = `-- name: SelectBookmarksByAccountIDPaginated :many
-SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, a.username AS account_username, t.name AS topic_name
+SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, 
+  a.username AS account_username, 
+  t.name AS topic_name,
+  (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
+  (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
 FROM bookmarks b
 JOIN posts p ON b.post_id = p.id
-JOIN accounts a ON b.account_id = a.id
+JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
 WHERE b.account_id = $1
 LIMIT $2 OFFSET $3
@@ -138,6 +154,9 @@ type SelectBookmarksByAccountIDPaginatedRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	TopicName       string
+	TotalComments   int64
+	TotalVotes      interface{}
+	VoteState       interface{}
 }
 
 func (q *Queries) SelectBookmarksByAccountIDPaginated(ctx context.Context, arg SelectBookmarksByAccountIDPaginatedParams) ([]SelectBookmarksByAccountIDPaginatedRow, error) {
@@ -159,6 +178,9 @@ func (q *Queries) SelectBookmarksByAccountIDPaginated(ctx context.Context, arg S
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.TopicName,
+			&i.TotalComments,
+			&i.TotalVotes,
+			&i.VoteState,
 		); err != nil {
 			return nil, err
 		}

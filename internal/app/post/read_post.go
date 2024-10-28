@@ -13,7 +13,11 @@ func (s *Service) GetPost(ctx context.Context, id string) (*Post, error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.repo.GetPostByID(ctx, uuid)
+	tokenPayload, err := user.GetTokenPayload(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.repo.GetPostByID(ctx, tokenPayload.AccountID, uuid)
 }
 
 // ListPostsParams defines the parameters to list posts.
@@ -26,6 +30,11 @@ type ListPostsParams struct {
 
 // ListPosts lists all posts from the repository with optional filters.
 func (s *Service) ListPosts(ctx context.Context, params ListPostsParams) ([]*Post, int64, error) {
+	tokenPayload, err := user.GetTokenPayload(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	accountID := tokenPayload.AccountID
 	if params.AccountID != "" {
 		uuid, err := uuid.Parse(params.AccountID)
 		if err != nil {
@@ -38,9 +47,9 @@ func (s *Service) ListPosts(ctx context.Context, params ListPostsParams) ([]*Pos
 		if err != nil {
 			return nil, 0, err
 		}
-		return s.repo.ListPostsByTopicID(ctx, uuid, params.Limit, params.Page)
+		return s.repo.ListPostsByTopicID(ctx, accountID, uuid, params.Limit, params.Page)
 	}
-	return s.repo.ListPosts(ctx, params.Limit, params.Page)
+	return s.repo.ListPosts(ctx, accountID, params.Limit, params.Page)
 }
 
 // ListPostsByTopic lists all posts from the repository by topic ID with optional filters.
@@ -49,7 +58,12 @@ func (s *Service) ListPostsByTopic(ctx context.Context, topicID string, limit, p
 	if err != nil {
 		return nil, 0, err
 	}
-	return s.repo.ListPostsByTopicID(ctx, uuid, limit, page)
+	tokenPayload, err := user.GetTokenPayload(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	accountID := tokenPayload.AccountID
+	return s.repo.ListPostsByTopicID(ctx, accountID, uuid, limit, page)
 }
 
 // ListPostsByAccount lists all posts from the repository by account ID with optional filters.

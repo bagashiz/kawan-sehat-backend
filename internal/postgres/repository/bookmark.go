@@ -35,7 +35,7 @@ func (r *PostgresRepository) ListAccountBookmarks(
 	if err != nil {
 		return nil, 0, err
 	}
-	count, err := r.db.CountPosts(ctx)
+	count, err := r.db.CountAccountBookmarks(ctx, accountID)
 	if err != nil {
 		return nil, 0, err
 	}

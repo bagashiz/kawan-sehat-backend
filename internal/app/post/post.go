@@ -8,13 +8,15 @@ import (
 
 // Post represents a user's story post on a topic.
 type Post struct {
-	ID        uuid.UUID
-	Account   *Account
-	Topic     *Topic
-	Title     string
-	Content   string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID            uuid.UUID
+	Account       *Account
+	Topic         *Topic
+	Title         string
+	Content       string
+	Vote          *Vote
+	TotalComments int64
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 
 // Account represents a user account the post belongs to.
@@ -27,6 +29,12 @@ type Account struct {
 type Topic struct {
 	ID   uuid.UUID
 	Name string
+}
+
+// Vote represents a vote on a post.
+type Vote struct {
+	Total int64
+	State int32
 }
 
 // New creates a new Post instance.
@@ -54,10 +62,15 @@ func New(accountID, topicID, title, content string) (*Post, error) {
 		Topic: &Topic{
 			ID: topicUUID,
 		},
-		Title:     title,
-		Content:   content,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		Title:   title,
+		Content: content,
+		Vote: &Vote{
+			Total: 0,
+			State: 0,
+		},
+		TotalComments: 0,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}, nil
 }
 
