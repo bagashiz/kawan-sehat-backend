@@ -10,12 +10,13 @@ import (
 
 // commentResponse holds the response data for the comment object.
 type commentResponse struct {
-	ID        string                  `json:"id"`
-	PostID    string                  `json:"post_id"`
-	Account   *commentAccountResponse `json:"account,omitempty"`
-	Vote      *commentVoteResponse    `json:"vote,omitempty"`
-	Content   string                  `json:"content"`
-	CreatedAt time.Time               `json:"created_at"`
+	ID           string                  `json:"id"`
+	PostID       string                  `json:"post_id"`
+	Account      *commentAccountResponse `json:"account,omitempty"`
+	Vote         *commentVoteResponse    `json:"vote,omitempty"`
+	TotalReplies int64                   `json:"total_replies"`
+	Content      string                  `json:"content"`
+	CreatedAt    time.Time               `json:"created_at"`
 }
 
 // commentAccountResponse holds the response data for the comment account object.
@@ -64,8 +65,9 @@ func (h *Handler) CreateComment() APIFunc {
 				Total: comment.Vote.Total,
 				State: comment.Vote.State,
 			},
-			Content:   comment.Content,
-			CreatedAt: comment.CreatedAt,
+			TotalReplies: comment.TotalReplies,
+			Content:      comment.Content,
+			CreatedAt:    comment.CreatedAt,
 		}
 		return writeJSON(w, http.StatusCreated, res, nil)
 	}
@@ -112,8 +114,9 @@ func (h *Handler) ListCommentsByPostID() APIFunc {
 					Total: c.Vote.Total,
 					State: c.Vote.State,
 				},
-				Content:   c.Content,
-				CreatedAt: c.CreatedAt,
+				TotalReplies: c.TotalReplies,
+				Content:      c.Content,
+				CreatedAt:    c.CreatedAt,
 			}
 		}
 		res := &listCommentsByPostIDResponse{

@@ -8,12 +8,13 @@ import (
 
 // Comment represents a comment on a post.
 type Comment struct {
-	ID        uuid.UUID
-	PostID    uuid.UUID
-	Account   *Account
-	Content   string
-	Vote      *Vote
-	CreatedAt time.Time
+	ID           uuid.UUID
+	PostID       uuid.UUID
+	Account      *Account
+	Content      string
+	Vote         *Vote
+	TotalReplies int64
+	CreatedAt    time.Time
 }
 
 // Account represents a user account the comment belongs to.
@@ -55,7 +56,8 @@ func New(accountID, postID, content string) (*Comment, error) {
 			State: 0,
 			Total: 0,
 		},
-		Content:   content,
-		CreatedAt: time.Now(),
+		TotalReplies: 0,
+		Content:      content,
+		CreatedAt:    time.Now(),
 	}, nil
 }

@@ -235,7 +235,8 @@ func (c SelectCommentsByPostIDRow) ToDomain() *comment.Comment {
 			Total: c.TotalVotes.(int64),
 			State: c.VoteState.(int32),
 		},
-		CreatedAt: c.CreatedAt,
+		TotalReplies: c.TotalReplies,
+		CreatedAt:    c.CreatedAt,
 	}
 }
 
@@ -253,6 +254,7 @@ func (c SelectCommentsByPostIDPaginatedRow) ToDomain() *comment.Comment {
 			Total: c.TotalVotes.(int64),
 			State: c.VoteState.(int32),
 		},
-		CreatedAt: c.CreatedAt,
+		TotalReplies: c.TotalReplies,
+		CreatedAt:    c.CreatedAt,
 	}
 }
