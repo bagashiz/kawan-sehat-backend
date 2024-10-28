@@ -11,6 +11,9 @@ func (te PostError) Error() string {
 }
 
 var (
+	ErrPostVoteInvalid      = PostError{"post vote data is invalid"}
+	ErrPostVoteNotFound     = PostError{"post vote does not exists"}
+	ErrPostVoteAlreadyVoted = PostError{"post vote already exists"}
 	// list of errors for post repository.
 	ErrPostInvalid             = PostError{"post data is invalid"}
 	ErrPostTopicNotFound       = PostError{"post topic not found"}

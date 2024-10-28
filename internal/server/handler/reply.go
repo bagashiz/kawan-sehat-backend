@@ -81,6 +81,30 @@ func (h *Handler) DeleteReply() APIFunc {
 	}
 }
 
+// UpvoteReply is the handler for the reply voting route.
+func (h *Handler) UpvoteReply() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		id := r.PathValue("id")
+		count, err := h.replySvc.UpvoteReply(r.Context(), id)
+		if err != nil {
+			return handlePostError(err)
+		}
+		return writeJSON(w, http.StatusOK, count, nil)
+	}
+}
+
+// DownvoteReply is the handler for the reply voting route.
+func (h *Handler) DownvoteReply() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		id := r.PathValue("id")
+		count, err := h.replySvc.DownvoteReply(r.Context(), id)
+		if err != nil {
+			return handlePostError(err)
+		}
+		return writeJSON(w, http.StatusOK, count, nil)
+	}
+}
+
 // listRepliesByCommentIDResponse holds the response data for the list replys by post ID handler.
 type listRepliesByCommentIDResponse struct {
 	Limit   int32            `json:"limit" validate:"omitempty,gte=1,lte=100"`

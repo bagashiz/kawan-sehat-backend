@@ -83,6 +83,30 @@ func (h *Handler) DeleteComment() APIFunc {
 	}
 }
 
+// UpvoteComment is the handler for the comment voting route.
+func (h *Handler) UpvoteComment() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		id := r.PathValue("id")
+		count, err := h.commentSvc.UpvoteComment(r.Context(), id)
+		if err != nil {
+			return handlePostError(err)
+		}
+		return writeJSON(w, http.StatusOK, count, nil)
+	}
+}
+
+// DownvoteComment is the handler for the comment voting route.
+func (h *Handler) DownvoteComment() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		id := r.PathValue("id")
+		count, err := h.commentSvc.DownvoteComment(r.Context(), id)
+		if err != nil {
+			return handlePostError(err)
+		}
+		return writeJSON(w, http.StatusOK, count, nil)
+	}
+}
+
 // listCommentsByPostIDResponse holds the response data for the list comments by post ID handler.
 type listCommentsByPostIDResponse struct {
 	Limit    int32              `json:"limit" validate:"omitempty,gte=1,lte=100"`

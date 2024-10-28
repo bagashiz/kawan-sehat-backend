@@ -207,7 +207,6 @@ type Topic struct {
 }
 
 type Vote struct {
-	ID        uuid.UUID
 	AccountID uuid.UUID
 	PostID    pgtype.UUID
 	CommentID pgtype.UUID

@@ -72,6 +72,8 @@ func postRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 	mux.Route("/posts", func(r chi.Router) {
 		mux.Post("/", handle(auth(h.CreatePost())))
 		mux.Post("/{id}/mark", handle(auth(h.Bookmark())))
+		mux.Post("/{id}/upvote", handle(auth(h.UpvotePost())))
+		mux.Post("/{id}/downvote", handle(auth(h.DownvotePost())))
 		mux.Put("/{id}", handle(auth(h.UpdatePost())))
 		mux.Delete("/{id}", handle(auth(h.DeletePost())))
 		mux.Delete("/{id}/unmark", handle(auth(h.Unbookmark())))
@@ -88,6 +90,8 @@ func commentRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 	mux := chi.NewRouter()
 	mux.Route("/comments", func(r chi.Router) {
 		mux.Post("/", handle(auth(h.CreateComment())))
+		mux.Post("/{id}/upvote", handle(auth(h.UpvoteComment())))
+		mux.Post("/{id}/downvote", handle(auth(h.DownvoteComment())))
 		mux.Delete("/{id}", handle(auth(h.DeleteComment())))
 		mux.Get("/{id}/replies", handle(auth(h.ListRepliesByCommentID())))
 	})
@@ -100,6 +104,8 @@ func replyRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 	mux := chi.NewRouter()
 	mux.Route("/replies", func(r chi.Router) {
 		mux.Post("/", handle(auth(h.CreateReply())))
+		mux.Post("/{id}/upvote", handle(auth(h.UpvoteReply())))
+		mux.Post("/{id}/downvote", handle(auth(h.DownvoteReply())))
 		mux.Delete("/{id}", handle(auth(h.DeleteReply())))
 	})
 	return mux

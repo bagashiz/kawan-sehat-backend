@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Querier interface {
@@ -32,6 +33,9 @@ type Querier interface {
 	InsertPost(ctx context.Context, arg InsertPostParams) error
 	InsertReply(ctx context.Context, arg InsertReplyParams) error
 	InsertTopic(ctx context.Context, arg InsertTopicParams) error
+	InsertVoteComment(ctx context.Context, arg InsertVoteCommentParams) error
+	InsertVotePost(ctx context.Context, arg InsertVotePostParams) error
+	InsertVoteReply(ctx context.Context, arg InsertVoteReplyParams) error
 	SelectAccountByID(ctx context.Context, id uuid.UUID) (Account, error)
 	SelectAccountByUsername(ctx context.Context, username string) (Account, error)
 	SelectAllPosts(ctx context.Context, accountID uuid.UUID) ([]SelectAllPostsRow, error)
@@ -51,12 +55,21 @@ type Querier interface {
 	SelectRepliesByCommentID(ctx context.Context, arg SelectRepliesByCommentIDParams) ([]SelectRepliesByCommentIDRow, error)
 	SelectRepliesByCommentIDPaginated(ctx context.Context, arg SelectRepliesByCommentIDPaginatedParams) ([]SelectRepliesByCommentIDPaginatedRow, error)
 	SelectReplyByID(ctx context.Context, id uuid.UUID) (Reply, error)
+	SelectSumVotesByCommentID(ctx context.Context, commentID pgtype.UUID) (interface{}, error)
+	SelectSumVotesByPostID(ctx context.Context, postID pgtype.UUID) (interface{}, error)
+	SelectSumVotesByReplyID(ctx context.Context, replyID pgtype.UUID) (interface{}, error)
 	SelectTopicByID(ctx context.Context, id uuid.UUID) (Topic, error)
 	SelectTopicsByAccountID(ctx context.Context, accountID uuid.UUID) ([]Topic, error)
 	SelectTopicsByAccountIDPaginated(ctx context.Context, arg SelectTopicsByAccountIDPaginatedParams) ([]Topic, error)
+	SelectVoteByCommentID(ctx context.Context, arg SelectVoteByCommentIDParams) (int16, error)
+	SelectVoteByPostID(ctx context.Context, arg SelectVoteByPostIDParams) (int16, error)
+	SelectVoteByReplyID(ctx context.Context, arg SelectVoteByReplyIDParams) (int16, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) error
 	UpdatePost(ctx context.Context, arg UpdatePostParams) error
 	UpdateTopic(ctx context.Context, arg UpdateTopicParams) error
+	UpdateVoteComment(ctx context.Context, arg UpdateVoteCommentParams) error
+	UpdateVotePost(ctx context.Context, arg UpdateVotePostParams) error
+	UpdateVoteReply(ctx context.Context, arg UpdateVoteReplyParams) error
 }
 
 var _ Querier = (*Queries)(nil)

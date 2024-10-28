@@ -49,3 +49,43 @@ func (s *Service) DeleteComment(ctx context.Context, id string) error {
 	}
 	return s.repo.DeleteComment(ctx, uuid)
 }
+
+// UpvoteComment adds +1 vote to a comment.
+func (s *Service) UpvoteComment(ctx context.Context, commentID string) (int64, error) {
+	commentUUID, err := uuid.Parse(commentID)
+	if err != nil {
+		return 0, err
+	}
+	tokenPayload, err := user.GetTokenPayload(ctx)
+	if err != nil {
+		return 0, err
+	}
+	_, err = s.repo.GetVoteComment(ctx, tokenPayload.AccountID, commentUUID)
+	if err != nil {
+		if err == ErrCommentVoteNotFound {
+			return s.repo.VoteComment(ctx, tokenPayload.AccountID, commentUUID, 1)
+		}
+		return 0, err
+	}
+	return s.repo.UpdateVoteComment(ctx, tokenPayload.AccountID, commentUUID, 1)
+}
+
+// DownvoteComment reduce -1 vote to a comment.
+func (s *Service) DownvoteComment(ctx context.Context, commentID string) (int64, error) {
+	commentUUID, err := uuid.Parse(commentID)
+	if err != nil {
+		return 0, err
+	}
+	tokenPayload, err := user.GetTokenPayload(ctx)
+	if err != nil {
+		return 0, err
+	}
+	_, err = s.repo.GetVoteComment(ctx, tokenPayload.AccountID, commentUUID)
+	if err != nil {
+		if err == ErrCommentVoteNotFound {
+			return s.repo.VoteComment(ctx, tokenPayload.AccountID, commentUUID, -1)
+		}
+		return 0, err
+	}
+	return s.repo.UpdateVoteComment(ctx, tokenPayload.AccountID, commentUUID, -1)
+}

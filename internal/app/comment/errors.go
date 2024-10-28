@@ -11,6 +11,9 @@ func (te CommentError) Error() string {
 }
 
 var (
+	ErrCommentVoteInvalid      = CommentError{"comment vote is invalid"}
+	ErrCommentVoteNotFound     = CommentError{"comment vote does not exists"}
+	ErrCommentVoteAlreadyVoted = CommentError{"comment vote already voted"}
 	// list of errors for comment repository.
 	ErrCommentInvalid         = CommentError{"comment data is invalid"}
 	ErrCommentActionForbidden = CommentError{"comment action is forbidden"}

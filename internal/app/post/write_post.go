@@ -101,3 +101,43 @@ func (s *Service) UnbookmarkPost(ctx context.Context, postID string) error {
 	}
 	return s.repo.UnbookmarkPost(ctx, bookmark)
 }
+
+// UpvotePost adds +1 vote to a post.
+func (s *Service) UpvotePost(ctx context.Context, postID string) (int64, error) {
+	postUUID, err := uuid.Parse(postID)
+	if err != nil {
+		return 0, err
+	}
+	tokenPayload, err := user.GetTokenPayload(ctx)
+	if err != nil {
+		return 0, err
+	}
+	_, err = s.repo.GetVotePost(ctx, tokenPayload.AccountID, postUUID)
+	if err != nil {
+		if err == ErrPostVoteNotFound {
+			return s.repo.VotePost(ctx, tokenPayload.AccountID, postUUID, 1)
+		}
+		return 0, err
+	}
+	return s.repo.UpdateVotePost(ctx, tokenPayload.AccountID, postUUID, 1)
+}
+
+// DownvotePost reduce -1 vote to a post.
+func (s *Service) DownvotePost(ctx context.Context, postID string) (int64, error) {
+	postUUID, err := uuid.Parse(postID)
+	if err != nil {
+		return 0, err
+	}
+	tokenPayload, err := user.GetTokenPayload(ctx)
+	if err != nil {
+		return 0, err
+	}
+	_, err = s.repo.GetVotePost(ctx, tokenPayload.AccountID, postUUID)
+	if err != nil {
+		if err == ErrPostVoteNotFound {
+			return s.repo.VotePost(ctx, tokenPayload.AccountID, postUUID, -1)
+		}
+		return 0, err
+	}
+	return s.repo.UpdateVotePost(ctx, tokenPayload.AccountID, postUUID, -1)
+}

@@ -1,6 +1,5 @@
 -- +goose Up
 CREATE TABLE IF NOT EXISTS "votes" (
-  "id" UUID PRIMARY KEY,
   "account_id" UUID NOT NULL,
   "post_id" UUID,
   "comment_id" UUID,
@@ -9,7 +8,9 @@ CREATE TABLE IF NOT EXISTS "votes" (
   "created_at" TIMESTAMPTZ NOT NULL DEFAULT (now()),
   "updated_at" TIMESTAMPTZ NOT NULL DEFAULT (now())
 );
-CREATE UNIQUE INDEX ON "votes" ("account_id", "post_id", "comment_id", "reply_id");
+CREATE UNIQUE INDEX ON "votes" ("account_id", "post_id");
+CREATE UNIQUE INDEX ON "votes" ("account_id", "comment_id");
+CREATE UNIQUE INDEX ON "votes" ("account_id", "reply_id");
 ALTER TABLE "votes" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id") ON DELETE CASCADE;
 ALTER TABLE "votes" ADD FOREIGN KEY ("post_id") REFERENCES "posts" ("id") ON DELETE CASCADE;
 ALTER TABLE "votes" ADD FOREIGN KEY ("comment_id") REFERENCES "comments" ("id") ON DELETE CASCADE;

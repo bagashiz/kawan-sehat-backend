@@ -153,6 +153,30 @@ func (h *Handler) DeletePost() APIFunc {
 	}
 }
 
+// UpvotePost is the handler for the post voting route.
+func (h *Handler) UpvotePost() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		id := r.PathValue("id")
+		count, err := h.postSvc.UpvotePost(r.Context(), id)
+		if err != nil {
+			return handlePostError(err)
+		}
+		return writeJSON(w, http.StatusOK, count, nil)
+	}
+}
+
+// DownvotePost is the handler for the post voting route.
+func (h *Handler) DownvotePost() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		id := r.PathValue("id")
+		count, err := h.postSvc.DownvotePost(r.Context(), id)
+		if err != nil {
+			return handlePostError(err)
+		}
+		return writeJSON(w, http.StatusOK, count, nil)
+	}
+}
+
 // GetPostByID is the handler for the post retrieval route.
 func (h *Handler) GetPostByID() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {

@@ -11,6 +11,9 @@ func (te ReplyError) Error() string {
 }
 
 var (
+	ErrReplyVoteInvalid      = ReplyError{"reply vote is invalid"}
+	ErrReplyVoteNotFound     = ReplyError{"reply vote does not exists"}
+	ErrReplyVoteAlreadyVoted = ReplyError{"reply vote already voted"}
 	// list of errors for reply repository.
 	ErrReplyInvalid         = ReplyError{"reply data is invalid"}
 	ErrReplyActionForbidden = ReplyError{"reply action is forbidden"}
