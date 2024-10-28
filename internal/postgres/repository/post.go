@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/post"
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/topic"
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/bagashiz/kawan-sehat-backend/internal/postgres"
 	"github.com/google/uuid"
 	"github.com/jackc/pgerrcode"
@@ -164,9 +166,14 @@ func handlePostError(err error) error {
 		case pgerrcode.IsDataException(pgErr.Code):
 			return post.ErrPostInvalid
 		case pgerrcode.IsIntegrityConstraintViolation(pgErr.Code):
-			return err
-		default:
-			return err
+			switch pgErr.ConstraintName {
+			case "posts_account_id_fkey":
+				return user.ErrAccountNotFound
+			case "posts_topic_id_fkey":
+				return topic.ErrTopicNotFound
+			default:
+				return err
+			}
 		}
 	}
 	return err

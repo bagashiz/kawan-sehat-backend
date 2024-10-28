@@ -171,6 +171,14 @@ type Bookmark struct {
 	CreatedAt time.Time
 }
 
+type Comment struct {
+	ID        uuid.UUID
+	PostID    uuid.UUID
+	AccountID uuid.UUID
+	Content   string
+	CreatedAt time.Time
+}
+
 type Post struct {
 	ID        uuid.UUID
 	AccountID uuid.UUID
@@ -181,6 +189,14 @@ type Post struct {
 	UpdatedAt time.Time
 }
 
+type Reply struct {
+	ID        uuid.UUID
+	CommentID uuid.UUID
+	AccountID uuid.UUID
+	Content   string
+	CreatedAt time.Time
+}
+
 type Topic struct {
 	ID          uuid.UUID
 	Name        string
@@ -188,4 +204,15 @@ type Topic struct {
 	Description string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+}
+
+type Vote struct {
+	ID        uuid.UUID
+	AccountID uuid.UUID
+	PostID    pgtype.UUID
+	CommentID pgtype.UUID
+	ReplyID   pgtype.UUID
+	Value     int16
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

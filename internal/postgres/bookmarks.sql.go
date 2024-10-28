@@ -45,7 +45,7 @@ func (q *Queries) DeleteBookmark(ctx context.Context, arg DeleteBookmarkParams) 
 const insertBookmark = `-- name: InsertBookmark :exec
 INSERT INTO bookmarks (
     account_id, post_id, created_at
-) VALUES ( 
+) VALUES (
   $1, $2, $3
 )
 `

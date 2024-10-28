@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/comment"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/post"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/topic"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
@@ -204,5 +205,54 @@ func (p SelectBookmarksByAccountIDPaginatedRow) ToDomain() *post.Post {
 		Content:   p.Content,
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
+	}
+}
+
+// ToDomain converts postgres repository results to domain entities.
+func (c Comment) ToDomain() *comment.Comment {
+	return &comment.Comment{
+		ID:     c.ID,
+		PostID: c.PostID,
+		Account: &comment.Account{
+			ID: c.AccountID,
+		},
+		Content:   c.Content,
+		CreatedAt: c.CreatedAt,
+	}
+}
+
+// ToDomain converts postgres repository results to domain entities.
+func (c SelectCommentsByPostIDRow) ToDomain() *comment.Comment {
+	return &comment.Comment{
+		ID:     c.ID,
+		PostID: c.PostID,
+		Account: &comment.Account{
+			ID:       c.AccountID,
+			Username: c.AccountUsername,
+		},
+		Content: c.Content,
+		Vote: &comment.Vote{
+			Total: c.TotalVotes.(int64),
+			State: c.VoteState.(int32),
+		},
+		CreatedAt: c.CreatedAt,
+	}
+}
+
+// ToDomain converts postgres repository results to domain entities.
+func (c SelectCommentsByPostIDPaginatedRow) ToDomain() *comment.Comment {
+	return &comment.Comment{
+		ID:     c.ID,
+		PostID: c.PostID,
+		Account: &comment.Account{
+			ID:       c.AccountID,
+			Username: c.AccountUsername,
+		},
+		Content: c.Content,
+		Vote: &comment.Vote{
+			Total: c.TotalVotes.(int64),
+			State: c.VoteState.(int32),
+		},
+		CreatedAt: c.CreatedAt,
 	}
 }
