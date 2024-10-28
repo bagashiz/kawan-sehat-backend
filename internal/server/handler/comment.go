@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/comment"
-	"github.com/bagashiz/kawan-sehat-backend/internal/app/post"
 )
 
 // commentResponse holds the response data for the comment object.
@@ -136,7 +135,7 @@ func handleCommentError(err error) APIError {
 		return ForbiddenRequest(err)
 	case comment.ErrCommentNotFound:
 		return NotFoundRequest(err)
-	case post.ErrPostInvalid:
+	case comment.ErrCommentInvalid:
 		return UnprocessableRequest(err)
 	default:
 		return BadRequest(err)
