@@ -38,6 +38,7 @@ func userRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 		mux.Put("/", handle(auth(h.UpdateAccount())))
 		mux.Get("/{id}", handle(h.GetAccountByID()))
 		mux.Get("/topics", handle(auth(h.ListFollowedTopics())))
+		mux.Get("/bookmarks", handle(auth(h.ListBookmarks())))
 	})
 	return mux
 }
@@ -66,8 +67,10 @@ func postRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 	mux := chi.NewRouter()
 	mux.Route("/posts", func(r chi.Router) {
 		mux.Post("/", handle(auth(h.CreatePost())))
+		mux.Post("/{id}/mark", handle(auth(h.Bookmark())))
 		mux.Put("/{id}", handle(auth(h.UpdatePost())))
 		mux.Delete("/{id}", handle(auth(h.DeletePost())))
+		mux.Delete("/{id}/unmark", handle(auth(h.Unbookmark())))
 		mux.Get("/{id}", handle(h.GetPostByID()))
 		mux.Get("/", handle(h.ListPosts()))
 	})

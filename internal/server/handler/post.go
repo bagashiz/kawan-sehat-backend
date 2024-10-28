@@ -186,6 +186,64 @@ func (h *Handler) ListPosts() APIFunc {
 	}
 }
 
+// Bookmark is the handler for the post bookmark route.
+func (h *Handler) Bookmark() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		id := r.PathValue("id")
+		err := h.postSvc.BookmarkPost(r.Context(), id)
+		if err != nil {
+			return handlePostError(err)
+		}
+		return writeJSON(w, http.StatusOK, nil, nil)
+	}
+}
+
+// Unbookmark is the handler for the post unbookmark route.
+func (h *Handler) Unbookmark() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		id := r.PathValue("id")
+		err := h.postSvc.UnbookmarkPost(r.Context(), id)
+		if err != nil {
+			return handlePostError(err)
+		}
+		return writeJSON(w, http.StatusOK, nil, nil)
+	}
+}
+
+// ListBookmarks is the handler for the post bookmarks route.
+func (h *Handler) ListBookmarks() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		limit, page := getLimitPage(r)
+
+		posts, count, err := h.postSvc.ListBookmarks(r.Context(), limit, page)
+		if err != nil {
+			return handlePostError(err)
+		}
+
+		postsRes := make([]postResponse, len(posts))
+		for i, p := range posts {
+			postsRes[i] = postResponse{
+				ID:        p.ID.String(),
+				AccountID: p.AccountID.String(),
+				TopicID:   p.TopicID.String(),
+				Title:     p.Title,
+				Content:   p.Content,
+				CreatedAt: p.CreatedAt,
+				UpdatedAt: p.UpdatedAt,
+			}
+		}
+
+		res := listPostsResponse{
+			Limit: limit,
+			Page:  page,
+			Count: count,
+			Posts: postsRes,
+		}
+
+		return writeJSON(w, http.StatusOK, res, nil)
+	}
+}
+
 // handlePostError converts the given error into an appropriate response.
 func handlePostError(err error) APIError {
 	switch err {
