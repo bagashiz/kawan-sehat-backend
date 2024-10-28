@@ -20,42 +20,42 @@ type ListPostsParams struct {
 	AccountID string
 	TopicID   string
 	Limit     int32
-	Offset    int32
+	Page      int32
 }
 
 // ListPosts lists all posts from the repository with optional filters.
-func (s *Service) ListPosts(ctx context.Context, params ListPostsParams) ([]*Post, error) {
+func (s *Service) ListPosts(ctx context.Context, params ListPostsParams) ([]*Post, int64, error) {
 	if params.AccountID != "" {
 		uuid, err := uuid.Parse(params.AccountID)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
-		return s.repo.ListPostsByAccountID(ctx, uuid, params.Limit, params.Offset)
+		return s.repo.ListPostsByAccountID(ctx, uuid, params.Limit, params.Page)
 	}
 	if params.TopicID != "" {
 		uuid, err := uuid.Parse(params.TopicID)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
-		return s.repo.ListPostsByTopicID(ctx, uuid, params.Limit, params.Offset)
+		return s.repo.ListPostsByTopicID(ctx, uuid, params.Limit, params.Page)
 	}
-	return s.repo.ListPosts(ctx, params.Limit, params.Offset)
+	return s.repo.ListPosts(ctx, params.Limit, params.Page)
 }
 
 // ListPostsByTopic lists all posts from the repository by topic ID with optional filters.
-func (s *Service) ListPostsByTopic(ctx context.Context, topicID string, limit, offset int32) ([]*Post, error) {
+func (s *Service) ListPostsByTopic(ctx context.Context, topicID string, limit, page int32) ([]*Post, int64, error) {
 	uuid, err := uuid.Parse(topicID)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return s.repo.ListPostsByTopicID(ctx, uuid, limit, offset)
+	return s.repo.ListPostsByTopicID(ctx, uuid, limit, page)
 }
 
 // ListPostsByAccount lists all posts from the repository by account ID with optional filters.
-func (s *Service) ListPostsByAccount(ctx context.Context, accountID string, limit, offset int32) ([]*Post, error) {
+func (s *Service) ListPostsByAccount(ctx context.Context, accountID string, limit, page int32) ([]*Post, int64, error) {
 	uuid, err := uuid.Parse(accountID)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return s.repo.ListPostsByAccountID(ctx, uuid, limit, offset)
+	return s.repo.ListPostsByAccountID(ctx, uuid, limit, page)
 }

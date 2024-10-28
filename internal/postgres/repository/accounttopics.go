@@ -29,29 +29,36 @@ func (r *PostgresRepository) RelateAccountToTopic(ctx context.Context, accountTo
 func (r *PostgresRepository) ListFollowedTopics(
 	ctx context.Context,
 	accountID uuid.UUID,
-	limit, offset int32,
-) ([]*topic.FollowedTopic, error) {
+	limit, page int32,
+) ([]*topic.FollowedTopic, int64, error) {
 	var results []postgres.Topic
 	var err error
 
-	if limit == 0 && offset == 0 {
+	if limit == 0 {
 		results, err = r.db.SelectTopicsByAccountID(ctx, accountID)
 	} else {
 		results, err = r.db.SelectTopicsByAccountIDPaginated(
 			ctx, postgres.SelectTopicsByAccountIDPaginatedParams{
 				AccountID: accountID,
 				Limit:     limit,
-				Offset:    offset,
+				Offset:    (page - 1) * limit,
 			})
 	}
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
+
+	count, err := r.db.CountTopicsByAccountID(ctx, accountID)
+	if err != nil {
+		return nil, 0, err
+	}
+
 	topics := make([]*topic.FollowedTopic, len(results))
 	for i, result := range results {
 		topics[i] = &topic.FollowedTopic{Topic: result.ToDomain()}
 	}
-	return topics, nil
+
+	return topics, count, err
 }
 
 // UnrelateAccountFromTopic deletes account topic data from postgres database.

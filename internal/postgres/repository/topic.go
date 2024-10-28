@@ -46,20 +46,25 @@ func (r *PostgresRepository) GetTopicByID(ctx context.Context, id uuid.UUID) (*t
 }
 
 // ListTopics retrieves all topics data from postgres database.
-func (r *PostgresRepository) ListTopics(ctx context.Context, limit, offset int32) ([]*topic.Topic, error) {
+func (r *PostgresRepository) ListTopics(ctx context.Context, limit, page int32) ([]*topic.Topic, int64, error) {
 	var results []postgres.Topic
 	var err error
 
-	if limit == 0 && offset == 0 {
+	offset := (page - 1) * limit
+	if limit == 0 {
 		results, err = r.db.SelectAllTopics(ctx)
 	} else {
 		results, err = r.db.SelectAllTopicsPaginated(ctx, postgres.SelectAllTopicsPaginatedParams{
-			Limit:  limit,
-			Offset: offset,
+			Limit: limit, Offset: offset,
 		})
 	}
 	if err != nil {
-		return nil, err
+		return nil, 0, err
+	}
+
+	count, err := r.db.CountTopics(ctx)
+	if err != nil {
+		return nil, 0, err
 	}
 
 	topics := make([]*topic.Topic, len(results))
@@ -67,7 +72,7 @@ func (r *PostgresRepository) ListTopics(ctx context.Context, limit, offset int32
 		topics[i] = result.ToDomain()
 	}
 
-	return topics, nil
+	return topics, count, nil
 }
 
 // UpdateTopic updates topic data in postgres database.

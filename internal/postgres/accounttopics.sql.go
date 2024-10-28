@@ -12,6 +12,18 @@ import (
 	"github.com/google/uuid"
 )
 
+const countTopicsByAccountID = `-- name: CountTopicsByAccountID :one
+SELECT COUNT(topic_id) FROM account_topics
+WHERE account_id = $1
+`
+
+func (q *Queries) CountTopicsByAccountID(ctx context.Context, accountID uuid.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, countTopicsByAccountID, accountID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const deleteAccountTopic = `-- name: DeleteAccountTopic :execrows
 DELETE FROM account_topics
 WHERE account_id = $1 AND topic_id = $2

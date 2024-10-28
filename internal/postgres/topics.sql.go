@@ -13,6 +13,17 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countTopics = `-- name: CountTopics :one
+SELECT COUNT(id) FROM topics
+`
+
+func (q *Queries) CountTopics(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countTopics)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const deleteTopic = `-- name: DeleteTopic :execrows
 DELETE FROM topics
 WHERE id = $1

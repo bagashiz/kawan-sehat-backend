@@ -137,26 +137,26 @@ func (h *Handler) GetPostByID() APIFunc {
 
 // listPostsResponse holds the response data for the list posts handler.
 type listPostsResponse struct {
-	Limit  int32          `json:"limit"`
-	Offset int32          `json:"offset"`
-	Count  int            `json:"count"`
-	Posts  []postResponse `json:"posts"`
+	Limit int32          `json:"limit"`
+	Page  int32          `json:"page"`
+	Count int64          `json:"count"`
+	Posts []postResponse `json:"posts"`
 }
 
 // ListPosts is the handler for the post list route.
 func (h *Handler) ListPosts() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		limit, offset := getLimitOffset(r)
+		limit, page := getLimitPage(r)
 		accountID := r.URL.Query().Get("account_id")
 		topicID := r.URL.Query().Get("topic_id")
 
-		posts, err := h.postSvc.ListPosts(
+		posts, count, err := h.postSvc.ListPosts(
 			r.Context(),
 			post.ListPostsParams{
 				AccountID: accountID,
 				TopicID:   topicID,
 				Limit:     limit,
-				Offset:    offset,
+				Page:      page,
 			})
 		if err != nil {
 			return handlePostError(err)
@@ -176,10 +176,10 @@ func (h *Handler) ListPosts() APIFunc {
 		}
 
 		res := listPostsResponse{
-			Limit:  limit,
-			Offset: offset,
-			Count:  len(posts),
-			Posts:  postsRes,
+			Limit: limit,
+			Page:  page,
+			Count: count,
+			Posts: postsRes,
 		}
 
 		return writeJSON(w, http.StatusOK, res, nil)

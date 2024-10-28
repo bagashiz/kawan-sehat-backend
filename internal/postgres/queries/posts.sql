@@ -10,6 +10,9 @@ SELECT * FROM posts
 WHERE id = $1
 LIMIT 1;
 
+-- name: CountPosts :one
+SELECT COUNT(id) FROM posts;
+
 -- name: SelectAllPosts :many
 SELECT * FROM posts
 ORDER BY created_at DESC;
@@ -19,6 +22,10 @@ SELECT * FROM posts
 ORDER BY created_at DESC
 LIMIT $1
 OFFSET $2;
+
+-- name: CountPostsByAccountID :one
+SELECT COUNT(id) FROM posts
+WHERE account_id = $1;
 
 -- name: SelectPostsByAccountID :many
 SELECT * FROM posts
@@ -31,6 +38,10 @@ WHERE account_id = $1
 ORDER BY created_at DESC
 LIMIT $2
 OFFSET $3;
+
+-- name: CountPostsByTopicID :one
+SELECT COUNT(id) FROM posts
+WHERE topic_id = $1;
 
 -- name: SelectPostsByTopicID :many
 SELECT * FROM posts

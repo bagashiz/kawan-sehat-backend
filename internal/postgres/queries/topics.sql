@@ -10,15 +10,18 @@ SELECT * FROM topics
 WHERE id = $1
 LIMIT 1;
 
+-- name: SelectAllTopics :many
+SELECT * FROM topics
+ORDER BY name;
+
+-- name: CountTopics :one
+SELECT COUNT(id) FROM topics;
+
 -- name: SelectAllTopicsPaginated :many
 SELECT * FROM topics
 ORDER BY name
 LIMIT $1
 OFFSET $2;
-
--- name: SelectAllTopics :many
-SELECT * FROM topics
-ORDER BY name;
 
 -- name: UpdateTopic :exec
 UPDATE topics

@@ -133,17 +133,17 @@ func (h *Handler) GetTopicByID() APIFunc {
 // listTopicsResponse holds the response data for the list topics handler.
 type listTopicsResponse struct {
 	Limit  int32           `json:"limit"`
-	Offset int32           `json:"offset"`
-	Count  int             `json:"count"`
+	Page   int32           `json:"page"`
+	Count  int64           `json:"count"`
 	Topics []topicResponse `json:"topics"`
 }
 
 // ListTopics is the handler for the topic list route.
 func (h *Handler) ListTopics() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		limit, offset := getLimitOffset(r)
+		limit, page := getLimitPage(r)
 
-		topics, err := h.topicSvc.ListTopics(r.Context(), limit, offset)
+		topics, count, err := h.topicSvc.ListTopics(r.Context(), limit, page)
 		if err != nil {
 			return handleTopicError(err)
 		}
@@ -162,8 +162,8 @@ func (h *Handler) ListTopics() APIFunc {
 
 		res := &listTopicsResponse{
 			Limit:  limit,
-			Offset: offset,
-			Count:  len(topics),
+			Page:   page,
+			Count:  count,
 			Topics: topicRes,
 		}
 

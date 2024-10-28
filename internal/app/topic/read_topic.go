@@ -18,16 +18,16 @@ func (s *Service) GetTopicByID(ctx context.Context, id string) (*Topic, error) {
 }
 
 // ListTopics lists all topics from the repository with optional filters.
-func (s *Service) ListTopics(ctx context.Context, limit, offset int32) ([]*Topic, error) {
-	return s.repo.ListTopics(ctx, limit, offset)
+func (s *Service) ListTopics(ctx context.Context, limit, page int32) ([]*Topic, int64, error) {
+	return s.repo.ListTopics(ctx, limit, page)
 }
 
 // ListFollowedTopics list all account's followed topics with optional filters.
-func (s *Service) ListFollowedTopics(ctx context.Context, limit, offset int32) ([]*FollowedTopic, error) {
+func (s *Service) ListFollowedTopics(ctx context.Context, limit, page int32) ([]*FollowedTopic, int64, error) {
 	tokenPayload, err := user.GetTokenPayload(ctx)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	accountID := tokenPayload.AccountID
-	return s.repo.ListFollowedTopics(ctx, accountID, limit, offset)
+	return s.repo.ListFollowedTopics(ctx, accountID, limit, page)
 }

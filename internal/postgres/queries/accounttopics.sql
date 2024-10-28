@@ -5,6 +5,10 @@ INSERT INTO account_topics (
   $1, $2, $3
 );
 
+-- name: CountTopicsByAccountID :one
+SELECT COUNT(topic_id) FROM account_topics
+WHERE account_id = $1;
+
 -- name: SelectTopicsByAccountID :many
 SELECT t.* FROM topics t
 JOIN account_topics at

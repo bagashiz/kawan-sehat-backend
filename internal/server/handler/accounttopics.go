@@ -35,25 +35,25 @@ func (h *Handler) UnfollowTopic() APIFunc {
 // listFollowedTopicsResponse holds the response data for the list followed topics handler.
 type listFollowedTopicsResponse struct {
 	Limit  int32                  `json:"limit"`
-	Offset int32                  `json:"offset"`
-	Count  int                    `json:"count"`
+	Page   int32                  `json:"page"`
+	Count  int64                  `json:"count"`
 	Topics []*topic.FollowedTopic `json:"topics"`
 }
 
 // ListFollowedTopics is the handler for fetching the authenticated user's followed topics.
 func (h *Handler) ListFollowedTopics() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		limit, offset := getLimitOffset(r)
+		limit, page := getLimitPage(r)
 
-		topics, err := h.topicSvc.ListFollowedTopics(r.Context(), limit, offset)
+		topics, count, err := h.topicSvc.ListFollowedTopics(r.Context(), limit, page)
 		if err != nil {
 			return handleAccountTopicError(err)
 		}
 
 		res := &listFollowedTopicsResponse{
 			Limit:  limit,
-			Offset: offset,
-			Count:  len(topics),
+			Page:   page,
+			Count:  count,
 			Topics: topics,
 		}
 

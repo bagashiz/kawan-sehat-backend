@@ -5,30 +5,27 @@ import (
 	"strconv"
 )
 
-// getLimitOffset extracts the limit and offset values from the request query.
-func getLimitOffset(r *http.Request) (int32, int32) {
-	limit := r.URL.Query().Get("limit")
-	offset := r.URL.Query().Get("offset")
-	limit32, err := stringToInt32(limit, 0)
-	if err != nil {
-		limit32 = 0
+// getLimitPage extracts the limit and page values from the request query,
+// if the values are not present or invalid, it returns the default values,
+// default limit is 0 and default page is 1.
+func getLimitPage(r *http.Request) (int32, int32) {
+	limit := stringToInt32(r.URL.Query().Get("limit"), 0)
+	page := stringToInt32(r.URL.Query().Get("page"), 1)
+	if page < 1 {
+		page = 1
 	}
-	offset32, err := stringToInt32(offset, 0)
-	if err != nil {
-		offset32 = 0
-	}
-	return limit32, offset32
+	return limit, page
 }
 
-// stringToInt32 converts a string to an int32,
-// if the string is empty, it returns the default value.
-func stringToInt32(s string, def int32) (int32, error) {
+// stringToInt32 converts a string  to an int32,
+// if the string is empty or invalid, it returns the default value.
+func stringToInt32(s string, def int32) int32 {
 	if s == "" {
-		return def, nil
+		return def
 	}
-	i64, err := strconv.ParseInt(s, 10, 32)
+	value, err := strconv.ParseInt(s, 10, 32)
 	if err != nil {
-		return 0, err
+		return def
 	}
-	return int32(i64), nil
+	return int32(value)
 }

@@ -9,8 +9,8 @@ import (
 // Reader is the interface that provides methods to read topic data from the storage.
 type Reader interface {
 	GetTopicByID(ctx context.Context, id uuid.UUID) (*Topic, error)
-	ListTopics(ctx context.Context, limit, offset int32) ([]*Topic, error)
-	ListFollowedTopics(ctx context.Context, accountID uuid.UUID, limit, offset int32) ([]*FollowedTopic, error)
+	ListTopics(ctx context.Context, limit, page int32) ([]*Topic, int64, error)
+	ListFollowedTopics(ctx context.Context, accountID uuid.UUID, limit, page int32) ([]*FollowedTopic, int64, error)
 }
 
 // Writer is the interface that provides methods to write topic data to the storage.
