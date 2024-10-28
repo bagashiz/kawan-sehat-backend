@@ -165,6 +165,12 @@ type AccountTopic struct {
 	CreatedAt time.Time
 }
 
+type Bookmark struct {
+	AccountID uuid.UUID
+	PostID    uuid.UUID
+	CreatedAt time.Time
+}
+
 type Post struct {
 	ID        uuid.UUID
 	AccountID uuid.UUID
