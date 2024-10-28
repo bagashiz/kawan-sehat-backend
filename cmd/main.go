@@ -8,6 +8,7 @@ import (
 
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/comment"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/post"
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/reply"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/topic"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/bagashiz/kawan-sehat-backend/internal/config"
@@ -69,8 +70,11 @@ func run(ctx context.Context, getEnv func(string) string) error {
 	topicSvc := topic.NewService(pgRepo)
 	postSvc := post.NewService(pgRepo)
 	commentSvc := comment.NewService(pgRepo)
+	replySvc := reply.NewService(pgRepo)
 
-	hndlr := handler.New(vldtr, userSvc, topicSvc, postSvc, commentSvc)
+	hndlr := handler.New(
+		vldtr, userSvc, topicSvc, postSvc, commentSvc, replySvc,
+	)
 	mw := middleware.New(tknzr)
 	srv := server.New(cfg.App, hndlr, mw)
 

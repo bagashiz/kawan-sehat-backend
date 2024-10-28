@@ -7,6 +7,7 @@ import (
 
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/comment"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/post"
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/reply"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/topic"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/bagashiz/kawan-sehat-backend/internal/validator"
@@ -19,6 +20,7 @@ type Handler struct {
 	topicSvc   *topic.Service
 	postSvc    *post.Service
 	commentSvc *comment.Service
+	replySvc   *reply.Service
 }
 
 // New creates a new Handler instance.
@@ -28,6 +30,7 @@ func New(
 	topicSvc *topic.Service,
 	postSvc *post.Service,
 	commentSvc *comment.Service,
+	replySvc *reply.Service,
 ) *Handler {
 	return &Handler{
 		validator:  validator,
@@ -35,6 +38,7 @@ func New(
 		topicSvc:   topicSvc,
 		postSvc:    postSvc,
 		commentSvc: commentSvc,
+		replySvc:   replySvc,
 	}
 }
 
