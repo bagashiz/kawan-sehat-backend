@@ -3,6 +3,7 @@ package postgres
 import (
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/comment"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/post"
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/reply"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/topic"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 )
@@ -256,5 +257,54 @@ func (c SelectCommentsByPostIDPaginatedRow) ToDomain() *comment.Comment {
 		},
 		TotalReplies: c.TotalReplies,
 		CreatedAt:    c.CreatedAt,
+	}
+}
+
+// ToDomain converts postgres repository results to domain entities.
+func (r Reply) ToDomain() *reply.Reply {
+	return &reply.Reply{
+		ID:        r.ID,
+		CommentID: r.CommentID,
+		Account: &reply.Account{
+			ID: r.AccountID,
+		},
+		Content:   r.Content,
+		CreatedAt: r.CreatedAt,
+	}
+}
+
+// ToDomain converts postgres repository results to domain entities.
+func (r SelectRepliesByCommentIDRow) ToDomain() *reply.Reply {
+	return &reply.Reply{
+		ID:        r.ID,
+		CommentID: r.CommentID,
+		Account: &reply.Account{
+			ID:       r.AccountID,
+			Username: r.AccountUsername,
+		},
+		Content: r.Content,
+		Vote: &reply.Vote{
+			Total: r.TotalVotes.(int64),
+			State: r.VoteState.(int32),
+		},
+		CreatedAt: r.CreatedAt,
+	}
+}
+
+// ToDomain converts postgres repository results to domain entities.
+func (c SelectRepliesByCommentIDPaginatedRow) ToDomain() *reply.Reply {
+	return &reply.Reply{
+		ID:        c.ID,
+		CommentID: c.CommentID,
+		Account: &reply.Account{
+			ID:       c.AccountID,
+			Username: c.AccountUsername,
+		},
+		Content: c.Content,
+		Vote: &reply.Vote{
+			Total: c.TotalVotes.(int64),
+			State: c.VoteState.(int32),
+		},
+		CreatedAt: c.CreatedAt,
 	}
 }

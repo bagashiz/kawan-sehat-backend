@@ -16,18 +16,21 @@ type Querier interface {
 	CountPosts(ctx context.Context) (int64, error)
 	CountPostsByAccountID(ctx context.Context, accountID uuid.UUID) (int64, error)
 	CountPostsByTopicID(ctx context.Context, topicID uuid.UUID) (int64, error)
+	CountRepliesByCommentID(ctx context.Context, commentID uuid.UUID) (int64, error)
 	CountTopics(ctx context.Context) (int64, error)
 	CountTopicsByAccountID(ctx context.Context, accountID uuid.UUID) (int64, error)
 	DeleteAccountTopic(ctx context.Context, arg DeleteAccountTopicParams) (int64, error)
 	DeleteBookmark(ctx context.Context, arg DeleteBookmarkParams) (int64, error)
 	DeleteComment(ctx context.Context, id uuid.UUID) (int64, error)
 	DeletePost(ctx context.Context, id uuid.UUID) (int64, error)
+	DeleteReply(ctx context.Context, id uuid.UUID) (int64, error)
 	DeleteTopic(ctx context.Context, id uuid.UUID) (int64, error)
 	InsertAccount(ctx context.Context, arg InsertAccountParams) error
 	InsertAccountTopic(ctx context.Context, arg InsertAccountTopicParams) error
 	InsertBookmark(ctx context.Context, arg InsertBookmarkParams) error
 	InsertComment(ctx context.Context, arg InsertCommentParams) error
 	InsertPost(ctx context.Context, arg InsertPostParams) error
+	InsertReply(ctx context.Context, arg InsertReplyParams) error
 	InsertTopic(ctx context.Context, arg InsertTopicParams) error
 	SelectAccountByID(ctx context.Context, id uuid.UUID) (Account, error)
 	SelectAccountByUsername(ctx context.Context, username string) (Account, error)
@@ -45,6 +48,9 @@ type Querier interface {
 	SelectPostsByAccountIDPaginated(ctx context.Context, arg SelectPostsByAccountIDPaginatedParams) ([]SelectPostsByAccountIDPaginatedRow, error)
 	SelectPostsByTopicID(ctx context.Context, topicID uuid.UUID) ([]SelectPostsByTopicIDRow, error)
 	SelectPostsByTopicIDPaginated(ctx context.Context, arg SelectPostsByTopicIDPaginatedParams) ([]SelectPostsByTopicIDPaginatedRow, error)
+	SelectRepliesByCommentID(ctx context.Context, arg SelectRepliesByCommentIDParams) ([]SelectRepliesByCommentIDRow, error)
+	SelectRepliesByCommentIDPaginated(ctx context.Context, arg SelectRepliesByCommentIDPaginatedParams) ([]SelectRepliesByCommentIDPaginatedRow, error)
+	SelectReplyByID(ctx context.Context, id uuid.UUID) (Reply, error)
 	SelectTopicByID(ctx context.Context, id uuid.UUID) (Topic, error)
 	SelectTopicsByAccountID(ctx context.Context, accountID uuid.UUID) ([]Topic, error)
 	SelectTopicsByAccountIDPaginated(ctx context.Context, arg SelectTopicsByAccountIDPaginatedParams) ([]Topic, error)

@@ -5,6 +5,7 @@ import (
 
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/comment"
 	"github.com/bagashiz/kawan-sehat-backend/internal/app/post"
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/reply"
 	"github.com/bagashiz/kawan-sehat-backend/internal/postgres"
 )
 
@@ -84,4 +85,24 @@ func toCommentDomain(results any) ([]*comment.Comment, error) {
 		return nil, fmt.Errorf("unexpected result type: %T", results)
 	}
 	return comments, nil
+}
+
+// toReplyDomain converts postgres repository results to domain entities.
+func toReplyDomain(results any) ([]*reply.Reply, error) {
+	var replies []*reply.Reply
+	switch res := results.(type) {
+	case []postgres.SelectRepliesByCommentIDRow:
+		replies = make([]*reply.Reply, len(res))
+		for i, result := range res {
+			replies[i] = result.ToDomain()
+		}
+	case []postgres.SelectRepliesByCommentIDPaginatedRow:
+		replies = make([]*reply.Reply, len(res))
+		for i, result := range res {
+			replies[i] = result.ToDomain()
+		}
+	default:
+		return nil, fmt.Errorf("unexpected result type: %T", results)
+	}
+	return replies, nil
 }
