@@ -47,6 +47,7 @@ type Querier interface {
 	SelectCommentByID(ctx context.Context, id uuid.UUID) (Comment, error)
 	SelectCommentsByPostID(ctx context.Context, arg SelectCommentsByPostIDParams) ([]SelectCommentsByPostIDRow, error)
 	SelectCommentsByPostIDPaginated(ctx context.Context, arg SelectCommentsByPostIDPaginatedParams) ([]SelectCommentsByPostIDPaginatedRow, error)
+	SelectIllnessHistoriesByAccountID(ctx context.Context, accountID uuid.UUID) ([]IllnessHistory, error)
 	SelectPostByID(ctx context.Context, arg SelectPostByIDParams) (SelectPostByIDRow, error)
 	SelectPostsByAccountID(ctx context.Context, accountID uuid.UUID) ([]SelectPostsByAccountIDRow, error)
 	SelectPostsByAccountIDPaginated(ctx context.Context, arg SelectPostsByAccountIDPaginatedParams) ([]SelectPostsByAccountIDPaginatedRow, error)

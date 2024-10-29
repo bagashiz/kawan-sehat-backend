@@ -3,11 +3,10 @@ INSERT INTO accounts (
     id, full_name, username,
     nik, email, password,
     gender, role, avatar,
-    illness_history,
     created_at, updated_at
 ) VALUES (
   $1, $2, $3, $4, $5, $6,
-  $7, $8, $9, $10, $11, $12
+  $7, $8, $9, $10, $11
 );
 
 -- name: UpdateAccount :exec
@@ -21,7 +20,6 @@ SET
   gender = COALESCE(sqlc.narg(gender), gender),
   role = COALESCE(sqlc.narg(role), role),
   avatar = COALESCE(sqlc.narg(avatar), avatar),
-  illness_history = COALESCE(sqlc.narg(illness_history), illness_history),
   updated_at = sqlc.arg(updated_at)
 WHERE id = $1;
 
@@ -34,3 +32,7 @@ LIMIT 1;
 SELECT * FROM accounts
 WHERE id = $1
 LIMIT 1;
+
+-- name: SelectIllnessHistoriesByAccountID :many
+SELECT * FROM illness_histories
+WHERE account_id = $1;

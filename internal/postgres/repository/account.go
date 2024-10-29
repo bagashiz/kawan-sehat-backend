@@ -22,15 +22,12 @@ func (r *PostgresRepository) AddAccount(ctx context.Context, account *user.Accou
 		Nik: pgtype.Text{
 			String: account.NIK, Valid: account.NIK != "" && len(account.NIK) <= 16,
 		},
-		Username: account.Username,
-		Email:    account.Email,
-		Password: account.Password,
-		Gender:   postgres.AccountGender(account.Gender),
-		Role:     postgres.AccountRole(account.Role),
-		Avatar:   postgres.AccountAvatar(account.Avatar),
-		IllnessHistory: pgtype.Text{
-			String: account.IllnessHistory, Valid: account.IllnessHistory != "",
-		},
+		Username:  account.Username,
+		Email:     account.Email,
+		Password:  account.Password,
+		Gender:    postgres.AccountGender(account.Gender),
+		Role:      postgres.AccountRole(account.Role),
+		Avatar:    postgres.AccountAvatar(account.Avatar),
 		CreatedAt: account.CreatedAt,
 		UpdatedAt: account.UpdatedAt,
 	}
@@ -60,7 +57,6 @@ func (r *PostgresRepository) UpdateAccount(ctx context.Context, account *user.Ac
 		Avatar: postgres.NullAccountAvatar{
 			AccountAvatar: postgres.AccountAvatar(account.Avatar), Valid: account.Avatar != "",
 		},
-		IllnessHistory: pgtype.Text{String: account.IllnessHistory, Valid: account.IllnessHistory != ""},
 	}
 
 	if err := r.db.UpdateAccount(ctx, arg); err != nil {
@@ -98,6 +94,21 @@ func (r *PostgresRepository) GetAccountByID(ctx context.Context, id uuid.UUID) (
 	account := result.ToDomain()
 
 	return account, nil
+}
+
+// ListIllnessHistoriesByAccountID retrieves user illness history data from postgres database.
+func (r *PostgresRepository) ListIllnessHistoriesByAccountID(
+	ctx context.Context, id uuid.UUID,
+) ([]*user.IllnessHistory, error) {
+	result, err := r.db.SelectIllnessHistoriesByAccountID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	illnessHistories := make([]*user.IllnessHistory, len(result))
+	for i, history := range result {
+		illnessHistories[i] = history.ToDomain()
+	}
+	return illnessHistories, nil
 }
 
 // handleAccountError handles account postgres repository errors and returns domain errors.

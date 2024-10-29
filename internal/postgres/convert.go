@@ -11,18 +11,26 @@ import (
 // ToDomain converts generated Account struct to domain account struct.
 func (a Account) ToDomain() *user.Account {
 	return &user.Account{
-		ID:             a.ID,
-		FullName:       a.FullName.String,
-		Username:       a.Username,
-		NIK:            a.Nik.String,
-		Email:          a.Email,
-		Password:       a.Password,
-		Gender:         user.Gender(a.Gender),
-		Role:           user.Role(a.Role),
-		Avatar:         user.Avatar(a.Avatar),
-		IllnessHistory: a.IllnessHistory.String,
-		CreatedAt:      a.CreatedAt,
-		UpdatedAt:      a.UpdatedAt,
+		ID:        a.ID,
+		FullName:  a.FullName.String,
+		Username:  a.Username,
+		NIK:       a.Nik.String,
+		Email:     a.Email,
+		Password:  a.Password,
+		Gender:    user.Gender(a.Gender),
+		Role:      user.Role(a.Role),
+		Avatar:    user.Avatar(a.Avatar),
+		CreatedAt: a.CreatedAt,
+		UpdatedAt: a.UpdatedAt,
+	}
+}
+
+// ToDomain converts generated Account struct to domain account struct.
+func (i IllnessHistory) ToDomain() *user.IllnessHistory {
+	return &user.IllnessHistory{
+		AccountID: i.AccountID,
+		Illness:   i.Illness,
+		Date:      i.Date.Time,
 	}
 }
 

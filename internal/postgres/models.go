@@ -145,18 +145,17 @@ func (ns NullAccountRole) Value() (driver.Value, error) {
 }
 
 type Account struct {
-	ID             uuid.UUID
-	FullName       pgtype.Text
-	Nik            pgtype.Text
-	Username       string
-	Email          string
-	Password       string
-	Gender         AccountGender
-	Role           AccountRole
-	Avatar         AccountAvatar
-	IllnessHistory pgtype.Text
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	ID        uuid.UUID
+	FullName  pgtype.Text
+	Nik       pgtype.Text
+	Username  string
+	Email     string
+	Password  string
+	Gender    AccountGender
+	Role      AccountRole
+	Avatar    AccountAvatar
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type AccountTopic struct {
@@ -177,6 +176,12 @@ type Comment struct {
 	AccountID uuid.UUID
 	Content   string
 	CreatedAt time.Time
+}
+
+type IllnessHistory struct {
+	AccountID uuid.UUID
+	Illness   string
+	Date      pgtype.Date
 }
 
 type Post struct {
