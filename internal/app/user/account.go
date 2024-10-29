@@ -39,18 +39,24 @@ const (
 
 // Account represents the user's account.
 type Account struct {
-	ID             uuid.UUID
-	FullName       string
-	Username       string
-	NIK            string
-	Email          string
-	Password       string
-	Gender         Gender
-	Role           Role
-	Avatar         Avatar
-	IllnessHistory string
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	ID        uuid.UUID
+	FullName  string
+	Username  string
+	NIK       string
+	Email     string
+	Password  string
+	Gender    Gender
+	Role      Role
+	Avatar    Avatar
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+// IllnessHistory represents the user's illness history.
+type IllnessHistory struct {
+	AccountID uuid.UUID
+	Illness   string
+	Date      time.Time
 }
 
 // New creates a new Account instance.
@@ -88,7 +94,7 @@ func (a *Account) ComparePassword(password string) bool {
 
 // Update updates the account with the given parameters.
 func (a *Account) Update(
-	fullName, userName, nik, email, password, gender, role, avatar, illnessHistory string,
+	fullName, userName, nik, email, password, gender, role, avatar string,
 ) error {
 	if fullName != "" {
 		a.FullName = fullName
@@ -113,9 +119,6 @@ func (a *Account) Update(
 	}
 	if avatar != "" {
 		a.Avatar = Avatar(avatar)
-	}
-	if illnessHistory != "" {
-		a.IllnessHistory = illnessHistory
 	}
 	if password != "" {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)

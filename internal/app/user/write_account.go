@@ -6,15 +6,14 @@ import (
 
 // UpdateAccountParams holds the parameters for the UpdateAccount method.
 type UpdateAccountParams struct {
-	FullName       string
-	Username       string
-	NIK            string
-	Email          string
-	Password       string
-	Gender         string
-	Role           string
-	Avatar         string
-	IllnessHistory string
+	FullName string
+	Username string
+	NIK      string
+	Email    string
+	Password string
+	Gender   string
+	Role     string
+	Avatar   string
 }
 
 // UpdateAccount updates the account with the given parameters.
@@ -33,7 +32,7 @@ func (s *Service) UpdateAccount(ctx context.Context, params UpdateAccountParams)
 	if err := current.Update(
 		params.FullName, params.Username, params.NIK,
 		params.Email, params.Password, params.Gender,
-		params.Role, params.Avatar, params.IllnessHistory,
+		params.Role, params.Avatar,
 	); err != nil {
 		return nil, err
 	}

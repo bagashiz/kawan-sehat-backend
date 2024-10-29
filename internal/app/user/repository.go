@@ -10,6 +10,7 @@ import (
 type Reader interface {
 	GetAccountByUsername(ctx context.Context, username string) (*Account, error)
 	GetAccountByID(ctx context.Context, id uuid.UUID) (*Account, error)
+	ListIllnessHistoriesByAccountID(ctx context.Context, id uuid.UUID) ([]*IllnessHistory, error)
 }
 
 // Writer is the interface that provides methods to write user data to the storage.
