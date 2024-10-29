@@ -41,6 +41,7 @@ func userRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 		mux.Post("/login", handle(h.LoginAccount()))
 		mux.Put("/", handle(auth(h.UpdateAccount())))
 		mux.Get("/{id}", handle(h.GetAccountByID()))
+		mux.Get("/illnesses", handle(auth(h.ListAccountIllnessHistories())))
 		mux.Get("/topics", handle(auth(h.ListFollowedTopics())))
 		mux.Get("/bookmarks", handle(auth(h.ListBookmarks())))
 	})
