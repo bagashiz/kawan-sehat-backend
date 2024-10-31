@@ -31,7 +31,7 @@ INSERT INTO accounts (
   'NONE',
   now(),
   now()
-);
+) ON CONFLICT (id) DO NOTHING;
 
 -- +goose Down
 DROP TABLE IF EXISTS accounts;
