@@ -25,7 +25,8 @@ func registerRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 		r.Mount("/replies", replyRouter)
 	})
 
-	mux.Get("/", handle(h.NotFound()))
+	mux.NotFound(handle(h.NotFound()))
+	mux.MethodNotAllowed(handle(h.NotAllowed()))
 	mux.Get("/healthz", handle(h.HealthCheck()))
 
 	return mux

@@ -33,6 +33,11 @@ func NotFoundRequest(err error) APIError {
 	return APIError{Message: err.Error(), StatusCode: http.StatusNotFound}
 }
 
+// NotAllowedRequest returns a HandlerError for a not allowed request with 405 status code.
+func NotAllowedRequest(err error) APIError {
+	return APIError{Message: err.Error(), StatusCode: http.StatusMethodNotAllowed}
+}
+
 // ConflictRequest returns a HandlerError for a ConflictRequest request with 409 status code.
 func ConflictRequest(err error) APIError {
 	return APIError{Message: err.Error(), StatusCode: http.StatusConflict}

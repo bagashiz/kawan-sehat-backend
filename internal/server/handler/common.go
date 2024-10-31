@@ -13,6 +13,14 @@ func (h *Handler) NotFound() APIFunc {
 	}
 }
 
+// NotAllowed is the handler for the 405 page.
+func (h *Handler) NotAllowed() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		err := errors.New("405 method not allowed")
+		return NotAllowedRequest(err)
+	}
+}
+
 // HealthCheck is the handler for the health check route.
 func (h *Handler) HealthCheck() APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
