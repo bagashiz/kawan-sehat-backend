@@ -67,6 +67,9 @@ func Handle(h APIFunc) http.HandlerFunc {
 			ResponseWriter: w,
 			statusCode:     http.StatusOK,
 		}
+		writer.Header().Set("Access-Control-Allow-Origin", "*")
+		writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		writer.Header().Set("Access-Control-Allow-Headers", "*")
 
 		if err := h(writer, r); err != nil {
 			statusCode := http.StatusInternalServerError
