@@ -6,11 +6,15 @@ import (
 	"github.com/bagashiz/kawan-sehat-backend/internal/server/handler"
 	"github.com/bagashiz/kawan-sehat-backend/internal/server/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 )
 
 // registerRoutes configures the routes for the application.
 func registerRoutes(h *handler.Handler, m *middleware.Middleware) *chi.Mux {
 	mux := chi.NewRouter()
+
+	mux.Use(cors.Handler(cors.Options{}))
+
 	userRouter := userRoutes(h, m)
 	topicRouter := topicRoutes(h, m)
 	postRouter := postRoutes(h, m)
