@@ -3,6 +3,7 @@ package post
 import (
 	"time"
 
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/google/uuid"
 )
 
@@ -23,6 +24,7 @@ type Post struct {
 type Account struct {
 	ID       uuid.UUID
 	Username string
+	Avatar   user.Avatar
 }
 
 // Topic represents a topic the post belongs to.

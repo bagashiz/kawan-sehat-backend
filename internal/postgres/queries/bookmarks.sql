@@ -11,8 +11,7 @@ WHERE account_id = $1;
 
 -- name: SelectBookmarksByAccountID :many
 SELECT p.*, 
-  a.username AS account_username, 
-  t.name AS topic_name,
+  a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
   COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
@@ -24,8 +23,7 @@ WHERE b.account_id = $1;
 
 -- name: SelectBookmarksByAccountIDPaginated :many
 SELECT p.*, 
-  a.username AS account_username, 
-  t.name AS topic_name,
+  a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
   COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state

@@ -53,6 +53,7 @@ func (p SelectPostByIDRow) ToDomain() *post.Post {
 		Account: &post.Account{
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
+			Avatar:   user.Avatar(p.AccountAvatar),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -77,6 +78,7 @@ func (p SelectAllPostsRow) ToDomain() *post.Post {
 		Account: &post.Account{
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
+			Avatar:   user.Avatar(p.AccountAvatar),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -101,6 +103,7 @@ func (p SelectAllPostsPaginatedRow) ToDomain() *post.Post {
 		Account: &post.Account{
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
+			Avatar:   user.Avatar(p.AccountAvatar),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -125,6 +128,7 @@ func (p SelectPostsByAccountIDRow) ToDomain() *post.Post {
 		Account: &post.Account{
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
+			Avatar:   user.Avatar(p.AccountAvatar),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -149,6 +153,7 @@ func (p SelectPostsByAccountIDPaginatedRow) ToDomain() *post.Post {
 		Account: &post.Account{
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
+			Avatar:   user.Avatar(p.AccountAvatar),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -173,6 +178,7 @@ func (p SelectPostsByTopicIDRow) ToDomain() *post.Post {
 		Account: &post.Account{
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
+			Avatar:   user.Avatar(p.AccountAvatar),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -197,6 +203,7 @@ func (p SelectPostsByTopicIDPaginatedRow) ToDomain() *post.Post {
 		Account: &post.Account{
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
+			Avatar:   user.Avatar(p.AccountAvatar),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -221,6 +228,7 @@ func (p SelectBookmarksByAccountIDRow) ToDomain() *post.Post {
 		Account: &post.Account{
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
+			Avatar:   user.Avatar(p.AccountAvatar),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -245,6 +253,7 @@ func (p SelectBookmarksByAccountIDPaginatedRow) ToDomain() *post.Post {
 		Account: &post.Account{
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
+			Avatar:   user.Avatar(p.AccountAvatar),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,

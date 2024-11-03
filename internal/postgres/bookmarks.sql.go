@@ -63,8 +63,7 @@ func (q *Queries) InsertBookmark(ctx context.Context, arg InsertBookmarkParams) 
 
 const selectBookmarksByAccountID = `-- name: SelectBookmarksByAccountID :many
 SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, 
-  a.username AS account_username, 
-  t.name AS topic_name,
+  a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
   COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
@@ -84,6 +83,7 @@ type SelectBookmarksByAccountIDRow struct {
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	AccountUsername string
+	AccountAvatar   AccountAvatar
 	TopicName       string
 	TotalComments   int64
 	TotalVotes      interface{}
@@ -108,6 +108,7 @@ func (q *Queries) SelectBookmarksByAccountID(ctx context.Context, accountID uuid
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.AccountUsername,
+			&i.AccountAvatar,
 			&i.TopicName,
 			&i.TotalComments,
 			&i.TotalVotes,
@@ -125,8 +126,7 @@ func (q *Queries) SelectBookmarksByAccountID(ctx context.Context, accountID uuid
 
 const selectBookmarksByAccountIDPaginated = `-- name: SelectBookmarksByAccountIDPaginated :many
 SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at, 
-  a.username AS account_username, 
-  t.name AS topic_name,
+  a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
   COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
@@ -153,6 +153,7 @@ type SelectBookmarksByAccountIDPaginatedRow struct {
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	AccountUsername string
+	AccountAvatar   AccountAvatar
 	TopicName       string
 	TotalComments   int64
 	TotalVotes      interface{}
@@ -177,6 +178,7 @@ func (q *Queries) SelectBookmarksByAccountIDPaginated(ctx context.Context, arg S
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.AccountUsername,
+			&i.AccountAvatar,
 			&i.TopicName,
 			&i.TotalComments,
 			&i.TotalVotes,
