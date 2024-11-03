@@ -10,7 +10,8 @@ SELECT p.*,
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -33,7 +34,8 @@ SELECT p.*,
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -44,7 +46,8 @@ SELECT p.*,
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -57,7 +60,8 @@ SELECT p.*,
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -69,7 +73,8 @@ SELECT p.*,
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -83,7 +88,8 @@ SELECT p.*,
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -95,7 +101,8 @@ SELECT p.*,
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id

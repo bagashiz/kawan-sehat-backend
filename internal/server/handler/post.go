@@ -16,6 +16,7 @@ type postResponse struct {
 	TotalComments int64                `json:"total_comments"`
 	Title         string               `json:"title"`
 	Content       string               `json:"content"`
+	IsBookmarked  bool                 `json:"is_bookmarked"`
 	CreatedAt     time.Time            `json:"created_at"`
 	UpdatedAt     time.Time            `json:"updated_at"`
 }
@@ -83,6 +84,7 @@ func (h *Handler) CreatePost() APIFunc {
 			TotalComments: post.TotalComments,
 			Title:         post.Title,
 			Content:       post.Content,
+			IsBookmarked:  post.IsBookmarked,
 			CreatedAt:     post.CreatedAt,
 			UpdatedAt:     post.UpdatedAt,
 		}
@@ -134,6 +136,7 @@ func (h *Handler) UpdatePost() APIFunc {
 			TotalComments: post.TotalComments,
 			Title:         post.Title,
 			Content:       post.Content,
+			IsBookmarked:  post.IsBookmarked,
 			CreatedAt:     post.CreatedAt,
 			UpdatedAt:     post.UpdatedAt,
 		}
@@ -208,6 +211,7 @@ func (h *Handler) GetPostByID() APIFunc {
 			TotalComments: post.TotalComments,
 			Title:         post.Title,
 			Content:       post.Content,
+			IsBookmarked:  post.IsBookmarked,
 			CreatedAt:     post.CreatedAt,
 			UpdatedAt:     post.UpdatedAt,
 		}
@@ -263,6 +267,7 @@ func (h *Handler) ListPosts() APIFunc {
 				TotalComments: post.TotalComments,
 				Title:         post.Title,
 				Content:       post.Content,
+				IsBookmarked:  post.IsBookmarked,
 				CreatedAt:     post.CreatedAt,
 				UpdatedAt:     post.UpdatedAt,
 			}
@@ -333,6 +338,7 @@ func (h *Handler) ListBookmarks() APIFunc {
 				TotalComments: post.TotalComments,
 				Title:         post.Title,
 				Content:       post.Content,
+				IsBookmarked:  post.IsBookmarked,
 				CreatedAt:     post.CreatedAt,
 				UpdatedAt:     post.UpdatedAt,
 			}

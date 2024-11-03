@@ -66,6 +66,7 @@ func (p SelectPostByIDRow) ToDomain() *post.Post {
 		TotalComments: p.TotalComments,
 		Title:         p.Title,
 		Content:       p.Content,
+		IsBookmarked:  p.IsBookmarked,
 		CreatedAt:     p.CreatedAt,
 		UpdatedAt:     p.UpdatedAt,
 	}
@@ -91,6 +92,7 @@ func (p SelectAllPostsRow) ToDomain() *post.Post {
 		TotalComments: p.TotalComments,
 		Title:         p.Title,
 		Content:       p.Content,
+		IsBookmarked:  p.IsBookmarked,
 		CreatedAt:     p.CreatedAt,
 		UpdatedAt:     p.UpdatedAt,
 	}
@@ -116,6 +118,7 @@ func (p SelectAllPostsPaginatedRow) ToDomain() *post.Post {
 		TotalComments: p.TotalComments,
 		Title:         p.Title,
 		Content:       p.Content,
+		IsBookmarked:  p.IsBookmarked,
 		CreatedAt:     p.CreatedAt,
 		UpdatedAt:     p.UpdatedAt,
 	}
@@ -141,6 +144,7 @@ func (p SelectPostsByAccountIDRow) ToDomain() *post.Post {
 		TotalComments: p.TotalComments,
 		Title:         p.Title,
 		Content:       p.Content,
+		IsBookmarked:  p.IsBookmarked,
 		CreatedAt:     p.CreatedAt,
 		UpdatedAt:     p.UpdatedAt,
 	}
@@ -166,6 +170,7 @@ func (p SelectPostsByAccountIDPaginatedRow) ToDomain() *post.Post {
 		TotalComments: p.TotalComments,
 		Title:         p.Title,
 		Content:       p.Content,
+		IsBookmarked:  p.IsBookmarked,
 		CreatedAt:     p.CreatedAt,
 		UpdatedAt:     p.UpdatedAt,
 	}
@@ -191,6 +196,7 @@ func (p SelectPostsByTopicIDRow) ToDomain() *post.Post {
 		TotalComments: p.TotalComments,
 		Title:         p.Title,
 		Content:       p.Content,
+		IsBookmarked:  p.IsBookmarked,
 		CreatedAt:     p.CreatedAt,
 		UpdatedAt:     p.UpdatedAt,
 	}
@@ -216,6 +222,7 @@ func (p SelectPostsByTopicIDPaginatedRow) ToDomain() *post.Post {
 		TotalComments: p.TotalComments,
 		Title:         p.Title,
 		Content:       p.Content,
+		IsBookmarked:  p.IsBookmarked,
 		CreatedAt:     p.CreatedAt,
 		UpdatedAt:     p.UpdatedAt,
 	}
@@ -241,6 +248,7 @@ func (p SelectBookmarksByAccountIDRow) ToDomain() *post.Post {
 		TotalComments: p.TotalComments,
 		Title:         p.Title,
 		Content:       p.Content,
+		IsBookmarked:  p.IsBookmarked,
 		CreatedAt:     p.CreatedAt,
 		UpdatedAt:     p.UpdatedAt,
 	}
@@ -266,6 +274,7 @@ func (p SelectBookmarksByAccountIDPaginatedRow) ToDomain() *post.Post {
 		TotalComments: p.TotalComments,
 		Title:         p.Title,
 		Content:       p.Content,
+		IsBookmarked:  p.IsBookmarked,
 		CreatedAt:     p.CreatedAt,
 		UpdatedAt:     p.UpdatedAt,
 	}

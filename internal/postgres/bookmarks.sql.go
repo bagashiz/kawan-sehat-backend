@@ -66,7 +66,8 @@ SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updat
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM bookmarks b
 JOIN posts p ON b.post_id = p.id
 JOIN accounts a ON p.account_id = a.id
@@ -88,6 +89,7 @@ type SelectBookmarksByAccountIDRow struct {
 	TotalComments   int64
 	TotalVotes      interface{}
 	VoteState       interface{}
+	IsBookmarked    bool
 }
 
 func (q *Queries) SelectBookmarksByAccountID(ctx context.Context, accountID uuid.UUID) ([]SelectBookmarksByAccountIDRow, error) {
@@ -113,6 +115,7 @@ func (q *Queries) SelectBookmarksByAccountID(ctx context.Context, accountID uuid
 			&i.TotalComments,
 			&i.TotalVotes,
 			&i.VoteState,
+			&i.IsBookmarked,
 		); err != nil {
 			return nil, err
 		}
@@ -129,7 +132,8 @@ SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updat
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM bookmarks b
 JOIN posts p ON b.post_id = p.id
 JOIN accounts a ON p.account_id = a.id
@@ -158,6 +162,7 @@ type SelectBookmarksByAccountIDPaginatedRow struct {
 	TotalComments   int64
 	TotalVotes      interface{}
 	VoteState       interface{}
+	IsBookmarked    bool
 }
 
 func (q *Queries) SelectBookmarksByAccountIDPaginated(ctx context.Context, arg SelectBookmarksByAccountIDPaginatedParams) ([]SelectBookmarksByAccountIDPaginatedRow, error) {
@@ -183,6 +188,7 @@ func (q *Queries) SelectBookmarksByAccountIDPaginated(ctx context.Context, arg S
 			&i.TotalComments,
 			&i.TotalVotes,
 			&i.VoteState,
+			&i.IsBookmarked,
 		); err != nil {
 			return nil, err
 		}

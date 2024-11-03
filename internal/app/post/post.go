@@ -16,6 +16,7 @@ type Post struct {
 	Content       string
 	Vote          *Vote
 	TotalComments int64
+	IsBookmarked  bool
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 }

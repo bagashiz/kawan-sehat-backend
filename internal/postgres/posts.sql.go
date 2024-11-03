@@ -97,7 +97,8 @@ SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updat
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -118,6 +119,7 @@ type SelectAllPostsRow struct {
 	TotalComments   int64
 	TotalVotes      interface{}
 	VoteState       interface{}
+	IsBookmarked    bool
 }
 
 func (q *Queries) SelectAllPosts(ctx context.Context, accountID uuid.UUID) ([]SelectAllPostsRow, error) {
@@ -143,6 +145,7 @@ func (q *Queries) SelectAllPosts(ctx context.Context, accountID uuid.UUID) ([]Se
 			&i.TotalComments,
 			&i.TotalVotes,
 			&i.VoteState,
+			&i.IsBookmarked,
 		); err != nil {
 			return nil, err
 		}
@@ -159,7 +162,8 @@ SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updat
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -188,6 +192,7 @@ type SelectAllPostsPaginatedRow struct {
 	TotalComments   int64
 	TotalVotes      interface{}
 	VoteState       interface{}
+	IsBookmarked    bool
 }
 
 func (q *Queries) SelectAllPostsPaginated(ctx context.Context, arg SelectAllPostsPaginatedParams) ([]SelectAllPostsPaginatedRow, error) {
@@ -213,6 +218,7 @@ func (q *Queries) SelectAllPostsPaginated(ctx context.Context, arg SelectAllPost
 			&i.TotalComments,
 			&i.TotalVotes,
 			&i.VoteState,
+			&i.IsBookmarked,
 		); err != nil {
 			return nil, err
 		}
@@ -229,7 +235,8 @@ SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updat
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -256,6 +263,7 @@ type SelectPostByIDRow struct {
 	TotalComments   int64
 	TotalVotes      interface{}
 	VoteState       interface{}
+	IsBookmarked    bool
 }
 
 func (q *Queries) SelectPostByID(ctx context.Context, arg SelectPostByIDParams) (SelectPostByIDRow, error) {
@@ -275,6 +283,7 @@ func (q *Queries) SelectPostByID(ctx context.Context, arg SelectPostByIDParams) 
 		&i.TotalComments,
 		&i.TotalVotes,
 		&i.VoteState,
+		&i.IsBookmarked,
 	)
 	return i, err
 }
@@ -284,7 +293,8 @@ SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updat
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -306,6 +316,7 @@ type SelectPostsByAccountIDRow struct {
 	TotalComments   int64
 	TotalVotes      interface{}
 	VoteState       interface{}
+	IsBookmarked    bool
 }
 
 func (q *Queries) SelectPostsByAccountID(ctx context.Context, accountID uuid.UUID) ([]SelectPostsByAccountIDRow, error) {
@@ -331,6 +342,7 @@ func (q *Queries) SelectPostsByAccountID(ctx context.Context, accountID uuid.UUI
 			&i.TotalComments,
 			&i.TotalVotes,
 			&i.VoteState,
+			&i.IsBookmarked,
 		); err != nil {
 			return nil, err
 		}
@@ -347,7 +359,8 @@ SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updat
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -377,6 +390,7 @@ type SelectPostsByAccountIDPaginatedRow struct {
 	TotalComments   int64
 	TotalVotes      interface{}
 	VoteState       interface{}
+	IsBookmarked    bool
 }
 
 func (q *Queries) SelectPostsByAccountIDPaginated(ctx context.Context, arg SelectPostsByAccountIDPaginatedParams) ([]SelectPostsByAccountIDPaginatedRow, error) {
@@ -402,6 +416,7 @@ func (q *Queries) SelectPostsByAccountIDPaginated(ctx context.Context, arg Selec
 			&i.TotalComments,
 			&i.TotalVotes,
 			&i.VoteState,
+			&i.IsBookmarked,
 		); err != nil {
 			return nil, err
 		}
@@ -418,7 +433,8 @@ SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updat
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -445,6 +461,7 @@ type SelectPostsByTopicIDRow struct {
 	TotalComments   int64
 	TotalVotes      interface{}
 	VoteState       interface{}
+	IsBookmarked    bool
 }
 
 func (q *Queries) SelectPostsByTopicID(ctx context.Context, arg SelectPostsByTopicIDParams) ([]SelectPostsByTopicIDRow, error) {
@@ -470,6 +487,7 @@ func (q *Queries) SelectPostsByTopicID(ctx context.Context, arg SelectPostsByTop
 			&i.TotalComments,
 			&i.TotalVotes,
 			&i.VoteState,
+			&i.IsBookmarked,
 		); err != nil {
 			return nil, err
 		}
@@ -486,7 +504,8 @@ SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updat
   a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
-  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state
+  COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
+  CASE WHEN EXISTS (SELECT 1 FROM bookmarks b WHERE b.post_id = p.id AND b.account_id = $1) THEN TRUE ELSE FALSE END AS is_bookmarked
 FROM posts p
 JOIN accounts a ON p.account_id = a.id
 JOIN topics t ON p.topic_id = t.id
@@ -517,6 +536,7 @@ type SelectPostsByTopicIDPaginatedRow struct {
 	TotalComments   int64
 	TotalVotes      interface{}
 	VoteState       interface{}
+	IsBookmarked    bool
 }
 
 func (q *Queries) SelectPostsByTopicIDPaginated(ctx context.Context, arg SelectPostsByTopicIDPaginatedParams) ([]SelectPostsByTopicIDPaginatedRow, error) {
@@ -547,6 +567,7 @@ func (q *Queries) SelectPostsByTopicIDPaginated(ctx context.Context, arg SelectP
 			&i.TotalComments,
 			&i.TotalVotes,
 			&i.VoteState,
+			&i.IsBookmarked,
 		); err != nil {
 			return nil, err
 		}
