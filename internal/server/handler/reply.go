@@ -21,6 +21,8 @@ type replyResponse struct {
 type replyAccountResponse struct {
 	ID       string `json:"id,omitempty"`
 	Username string `json:"username,omitempty"`
+	Avatar   string `json:"avatar,omitempty"`
+	Role     string `json:"role,omitempty"`
 }
 
 // replyVoteResponse holds the response data for the reply vote object.
@@ -57,7 +59,10 @@ func (h *Handler) CreateReply() APIFunc {
 			ID:        reply.ID.String(),
 			CommentID: reply.CommentID.String(),
 			Account: &replyAccountResponse{
-				ID: reply.Account.ID.String(),
+				ID:       reply.Account.ID.String(),
+				Username: reply.Account.Username,
+				Avatar:   string(reply.Account.Avatar),
+				Role:     string(reply.Account.Role),
 			},
 			Vote: &replyVoteResponse{
 				Total: reply.Vote.Total,
@@ -123,20 +128,22 @@ func (h *Handler) ListRepliesByCommentID() APIFunc {
 			return handleReplyError(err)
 		}
 		replysRes := make([]*replyResponse, len(replys))
-		for i, c := range replys {
+		for i, r := range replys {
 			replysRes[i] = &replyResponse{
-				ID:        c.ID.String(),
-				CommentID: c.CommentID.String(),
+				ID:        r.ID.String(),
+				CommentID: r.CommentID.String(),
 				Account: &replyAccountResponse{
-					ID:       c.Account.ID.String(),
-					Username: c.Account.Username,
+					ID:       r.Account.ID.String(),
+					Username: r.Account.Username,
+					Avatar:   string(r.Account.Avatar),
+					Role:     string(r.Account.Role),
 				},
 				Vote: &replyVoteResponse{
-					Total: c.Vote.Total,
-					State: c.Vote.State,
+					Total: r.Vote.Total,
+					State: r.Vote.State,
 				},
-				Content:   c.Content,
-				CreatedAt: c.CreatedAt,
+				Content:   r.Content,
+				CreatedAt: r.CreatedAt,
 			}
 		}
 		res := &listRepliesByCommentIDResponse{

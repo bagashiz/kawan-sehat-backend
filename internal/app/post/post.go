@@ -26,6 +26,7 @@ type Account struct {
 	ID       uuid.UUID
 	Username string
 	Avatar   user.Avatar
+	Role     user.Role
 }
 
 // Topic represents a topic the post belongs to.

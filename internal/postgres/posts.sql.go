@@ -94,7 +94,8 @@ func (q *Queries) InsertPost(ctx context.Context, arg InsertPostParams) error {
 
 const selectAllPosts = `-- name: SelectAllPosts :many
 SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
-  a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
+  a.username AS account_username, a.avatar AS account_avatar, a.role AS account_role, 
+  t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
   COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
@@ -115,6 +116,7 @@ type SelectAllPostsRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	AccountAvatar   AccountAvatar
+	AccountRole     AccountRole
 	TopicName       string
 	TotalComments   int64
 	TotalVotes      interface{}
@@ -141,6 +143,7 @@ func (q *Queries) SelectAllPosts(ctx context.Context, accountID uuid.UUID) ([]Se
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.AccountAvatar,
+			&i.AccountRole,
 			&i.TopicName,
 			&i.TotalComments,
 			&i.TotalVotes,
@@ -159,7 +162,8 @@ func (q *Queries) SelectAllPosts(ctx context.Context, accountID uuid.UUID) ([]Se
 
 const selectAllPostsPaginated = `-- name: SelectAllPostsPaginated :many
 SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
-  a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
+  a.username AS account_username, a.avatar AS account_avatar, a.role AS account_role, 
+  t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
   COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
@@ -188,6 +192,7 @@ type SelectAllPostsPaginatedRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	AccountAvatar   AccountAvatar
+	AccountRole     AccountRole
 	TopicName       string
 	TotalComments   int64
 	TotalVotes      interface{}
@@ -214,6 +219,7 @@ func (q *Queries) SelectAllPostsPaginated(ctx context.Context, arg SelectAllPost
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.AccountAvatar,
+			&i.AccountRole,
 			&i.TopicName,
 			&i.TotalComments,
 			&i.TotalVotes,
@@ -232,7 +238,8 @@ func (q *Queries) SelectAllPostsPaginated(ctx context.Context, arg SelectAllPost
 
 const selectPostByID = `-- name: SelectPostByID :one
 SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
-  a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
+  a.username AS account_username, a.avatar AS account_avatar, a.role AS account_role, 
+  t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
   COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
@@ -259,6 +266,7 @@ type SelectPostByIDRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	AccountAvatar   AccountAvatar
+	AccountRole     AccountRole
 	TopicName       string
 	TotalComments   int64
 	TotalVotes      interface{}
@@ -279,6 +287,7 @@ func (q *Queries) SelectPostByID(ctx context.Context, arg SelectPostByIDParams) 
 		&i.UpdatedAt,
 		&i.AccountUsername,
 		&i.AccountAvatar,
+		&i.AccountRole,
 		&i.TopicName,
 		&i.TotalComments,
 		&i.TotalVotes,
@@ -290,7 +299,8 @@ func (q *Queries) SelectPostByID(ctx context.Context, arg SelectPostByIDParams) 
 
 const selectPostsByAccountID = `-- name: SelectPostsByAccountID :many
 SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
-  a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
+  a.username AS account_username, a.avatar AS account_avatar, a.role AS account_role, 
+  t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
   COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
@@ -312,6 +322,7 @@ type SelectPostsByAccountIDRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	AccountAvatar   AccountAvatar
+	AccountRole     AccountRole
 	TopicName       string
 	TotalComments   int64
 	TotalVotes      interface{}
@@ -338,6 +349,7 @@ func (q *Queries) SelectPostsByAccountID(ctx context.Context, accountID uuid.UUI
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.AccountAvatar,
+			&i.AccountRole,
 			&i.TopicName,
 			&i.TotalComments,
 			&i.TotalVotes,
@@ -356,7 +368,8 @@ func (q *Queries) SelectPostsByAccountID(ctx context.Context, accountID uuid.UUI
 
 const selectPostsByAccountIDPaginated = `-- name: SelectPostsByAccountIDPaginated :many
 SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
-  a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
+  a.username AS account_username, a.avatar AS account_avatar, a.role AS account_role, 
+  t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
   COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
@@ -386,6 +399,7 @@ type SelectPostsByAccountIDPaginatedRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	AccountAvatar   AccountAvatar
+	AccountRole     AccountRole
 	TopicName       string
 	TotalComments   int64
 	TotalVotes      interface{}
@@ -412,6 +426,7 @@ func (q *Queries) SelectPostsByAccountIDPaginated(ctx context.Context, arg Selec
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.AccountAvatar,
+			&i.AccountRole,
 			&i.TopicName,
 			&i.TotalComments,
 			&i.TotalVotes,
@@ -430,7 +445,8 @@ func (q *Queries) SelectPostsByAccountIDPaginated(ctx context.Context, arg Selec
 
 const selectPostsByTopicID = `-- name: SelectPostsByTopicID :many
 SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
-  a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
+  a.username AS account_username, a.avatar AS account_avatar, a.role AS account_role, 
+  t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
   COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
@@ -457,6 +473,7 @@ type SelectPostsByTopicIDRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	AccountAvatar   AccountAvatar
+	AccountRole     AccountRole
 	TopicName       string
 	TotalComments   int64
 	TotalVotes      interface{}
@@ -483,6 +500,7 @@ func (q *Queries) SelectPostsByTopicID(ctx context.Context, arg SelectPostsByTop
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.AccountAvatar,
+			&i.AccountRole,
 			&i.TopicName,
 			&i.TotalComments,
 			&i.TotalVotes,
@@ -501,7 +519,8 @@ func (q *Queries) SelectPostsByTopicID(ctx context.Context, arg SelectPostsByTop
 
 const selectPostsByTopicIDPaginated = `-- name: SelectPostsByTopicIDPaginated :many
 SELECT p.id, p.account_id, p.topic_id, p.title, p.content, p.created_at, p.updated_at,
-  a.username AS account_username, a.avatar AS account_avatar, t.name AS topic_name,
+  a.username AS account_username, a.avatar AS account_avatar, a.role AS account_role, 
+  t.name AS topic_name,
   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
   (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.post_id = p.id) AS total_votes,
   COALESCE((SELECT v.value FROM votes v WHERE v.post_id = p.id AND v.account_id = $1), 0) AS vote_state,
@@ -532,6 +551,7 @@ type SelectPostsByTopicIDPaginatedRow struct {
 	UpdatedAt       time.Time
 	AccountUsername string
 	AccountAvatar   AccountAvatar
+	AccountRole     AccountRole
 	TopicName       string
 	TotalComments   int64
 	TotalVotes      interface{}
@@ -563,6 +583,7 @@ func (q *Queries) SelectPostsByTopicIDPaginated(ctx context.Context, arg SelectP
 			&i.UpdatedAt,
 			&i.AccountUsername,
 			&i.AccountAvatar,
+			&i.AccountRole,
 			&i.TopicName,
 			&i.TotalComments,
 			&i.TotalVotes,

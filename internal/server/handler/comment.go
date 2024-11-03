@@ -22,6 +22,8 @@ type commentResponse struct {
 type commentAccountResponse struct {
 	ID       string `json:"id,omitempty"`
 	Username string `json:"username,omitempty"`
+	Avatar   string `json:"avatar,omitempty"`
+	Role     string `json:"role,omitempty"`
 }
 
 // commentVoteResponse holds the response data for the comment vote object.
@@ -58,7 +60,10 @@ func (h *Handler) CreateComment() APIFunc {
 			ID:     comment.ID.String(),
 			PostID: comment.PostID.String(),
 			Account: &commentAccountResponse{
-				ID: comment.Account.ID.String(),
+				ID:       comment.Account.ID.String(),
+				Username: comment.Account.Username,
+				Avatar:   string(comment.Account.Avatar),
+				Role:     string(comment.Account.Role),
 			},
 			Vote: &commentVoteResponse{
 				Total: comment.Vote.Total,
@@ -132,6 +137,8 @@ func (h *Handler) ListCommentsByPostID() APIFunc {
 				Account: &commentAccountResponse{
 					ID:       c.Account.ID.String(),
 					Username: c.Account.Username,
+					Avatar:   string(c.Account.Avatar),
+					Role:     string(c.Account.Role),
 				},
 				Vote: &commentVoteResponse{
 					Total: c.Vote.Total,

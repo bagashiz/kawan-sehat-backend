@@ -26,6 +26,7 @@ type postAccountResponse struct {
 	ID       string `json:"id,omitempty"`
 	Username string `json:"username,omitempty"`
 	Avatar   string `json:"avatar,omitempty"`
+	Role     string `json:"role,omitempty"`
 }
 
 // postTopicResponse holds the response data for the post topic object.
@@ -72,6 +73,7 @@ func (h *Handler) CreatePost() APIFunc {
 				ID:       post.Account.ID.String(),
 				Username: post.Account.Username,
 				Avatar:   string(post.Account.Avatar),
+				Role:     string(post.Account.Role),
 			},
 			Topic: &postTopicResponse{
 				ID:   post.Topic.ID.String(),
@@ -124,6 +126,7 @@ func (h *Handler) UpdatePost() APIFunc {
 				ID:       post.Account.ID.String(),
 				Username: post.Account.Username,
 				Avatar:   string(post.Account.Avatar),
+				Role:     string(post.Account.Role),
 			},
 			Topic: &postTopicResponse{
 				ID:   post.Topic.ID.String(),
@@ -199,6 +202,7 @@ func (h *Handler) GetPostByID() APIFunc {
 				ID:       post.Account.ID.String(),
 				Username: post.Account.Username,
 				Avatar:   string(post.Account.Avatar),
+				Role:     string(post.Account.Role),
 			},
 			Topic: &postTopicResponse{
 				ID:   post.Topic.ID.String(),
@@ -255,6 +259,7 @@ func (h *Handler) ListPosts() APIFunc {
 					ID:       post.Account.ID.String(),
 					Username: post.Account.Username,
 					Avatar:   string(post.Account.Avatar),
+					Role:     string(post.Account.Role),
 				},
 				Topic: &postTopicResponse{
 					ID:   post.Topic.ID.String(),
@@ -326,6 +331,7 @@ func (h *Handler) ListBookmarks() APIFunc {
 					ID:       post.Account.ID.String(),
 					Username: post.Account.Username,
 					Avatar:   string(post.Account.Avatar),
+					Role:     string(post.Account.Role),
 				},
 				Topic: &postTopicResponse{
 					ID:   post.Topic.ID.String(),

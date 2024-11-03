@@ -66,7 +66,7 @@ func (q *Queries) InsertReply(ctx context.Context, arg InsertReplyParams) error 
 
 const selectRepliesByCommentID = `-- name: SelectRepliesByCommentID :many
 SELECT r.id, r.comment_id, r.account_id, r.content, r.created_at, 
-       a.username AS account_username,
+       a.username AS account_username, a.avatar AS account_avatar, a.role AS account_role, 
        (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.reply_id = r.id) AS total_votes,
        COALESCE((SELECT v.value FROM votes v WHERE v.reply_id = r.id AND v.account_id = $1), 0) AS vote_state
 FROM replies r
@@ -87,6 +87,8 @@ type SelectRepliesByCommentIDRow struct {
 	Content         string
 	CreatedAt       time.Time
 	AccountUsername string
+	AccountAvatar   AccountAvatar
+	AccountRole     AccountRole
 	TotalVotes      interface{}
 	VoteState       interface{}
 }
@@ -107,6 +109,8 @@ func (q *Queries) SelectRepliesByCommentID(ctx context.Context, arg SelectReplie
 			&i.Content,
 			&i.CreatedAt,
 			&i.AccountUsername,
+			&i.AccountAvatar,
+			&i.AccountRole,
 			&i.TotalVotes,
 			&i.VoteState,
 		); err != nil {
@@ -121,8 +125,9 @@ func (q *Queries) SelectRepliesByCommentID(ctx context.Context, arg SelectReplie
 }
 
 const selectRepliesByCommentIDPaginated = `-- name: SelectRepliesByCommentIDPaginated :many
-SELECT r.id, r.comment_id, r.account_id, r.content, r.created_at, a.username AS account_username,
-    (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.reply_id = r.id) AS total_votes,
+SELECT r.id, r.comment_id, r.account_id, r.content, r.created_at,
+       a.username AS account_username, a.avatar AS account_avatar, a.role AS account_role, 
+       (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.reply_id = r.id) AS total_votes,
        COALESCE((SELECT v.value FROM votes v WHERE v.reply_id = r.id AND v.account_id = $1), 0) AS vote_state
 FROM replies r
 JOIN accounts a ON r.account_id = a.id
@@ -146,6 +151,8 @@ type SelectRepliesByCommentIDPaginatedRow struct {
 	Content         string
 	CreatedAt       time.Time
 	AccountUsername string
+	AccountAvatar   AccountAvatar
+	AccountRole     AccountRole
 	TotalVotes      interface{}
 	VoteState       interface{}
 }
@@ -171,6 +178,8 @@ func (q *Queries) SelectRepliesByCommentIDPaginated(ctx context.Context, arg Sel
 			&i.Content,
 			&i.CreatedAt,
 			&i.AccountUsername,
+			&i.AccountAvatar,
+			&i.AccountRole,
 			&i.TotalVotes,
 			&i.VoteState,
 		); err != nil {

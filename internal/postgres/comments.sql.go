@@ -84,7 +84,7 @@ func (q *Queries) SelectCommentByID(ctx context.Context, id uuid.UUID) (Comment,
 
 const selectCommentsByPostID = `-- name: SelectCommentsByPostID :many
 SELECT c.id, c.post_id, c.account_id, c.content, c.created_at, 
-       a.username AS account_username,
+       a.username AS account_username, a.avatar AS account_avatar, a.role AS account_role, 
        (SELECT COUNT(*) FROM replies r WHERE r.comment_id = c.id) AS total_replies,
        (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.comment_id = c.id) AS total_votes,
        COALESCE((SELECT v.value FROM votes v WHERE v.comment_id = c.id AND v.account_id = $1), 0) AS vote_state
@@ -106,6 +106,8 @@ type SelectCommentsByPostIDRow struct {
 	Content         string
 	CreatedAt       time.Time
 	AccountUsername string
+	AccountAvatar   AccountAvatar
+	AccountRole     AccountRole
 	TotalReplies    int64
 	TotalVotes      interface{}
 	VoteState       interface{}
@@ -127,6 +129,8 @@ func (q *Queries) SelectCommentsByPostID(ctx context.Context, arg SelectComments
 			&i.Content,
 			&i.CreatedAt,
 			&i.AccountUsername,
+			&i.AccountAvatar,
+			&i.AccountRole,
 			&i.TotalReplies,
 			&i.TotalVotes,
 			&i.VoteState,
@@ -142,7 +146,8 @@ func (q *Queries) SelectCommentsByPostID(ctx context.Context, arg SelectComments
 }
 
 const selectCommentsByPostIDPaginated = `-- name: SelectCommentsByPostIDPaginated :many
-SELECT c.id, c.post_id, c.account_id, c.content, c.created_at, a.username AS account_username,
+SELECT c.id, c.post_id, c.account_id, c.content, c.created_at,
+    a.username AS account_username, a.avatar AS account_avatar, a.role AS account_role, 
     (SELECT COUNT(*) FROM replies r WHERE r.comment_id = c.id) AS total_replies,
     (SELECT COALESCE(SUM(v.value), 0) FROM votes v WHERE v.comment_id = c.id) AS total_votes,
        COALESCE((SELECT v.value FROM votes v WHERE v.comment_id = c.id AND v.account_id = $1), 0) AS vote_state
@@ -168,6 +173,8 @@ type SelectCommentsByPostIDPaginatedRow struct {
 	Content         string
 	CreatedAt       time.Time
 	AccountUsername string
+	AccountAvatar   AccountAvatar
+	AccountRole     AccountRole
 	TotalReplies    int64
 	TotalVotes      interface{}
 	VoteState       interface{}
@@ -194,6 +201,8 @@ func (q *Queries) SelectCommentsByPostIDPaginated(ctx context.Context, arg Selec
 			&i.Content,
 			&i.CreatedAt,
 			&i.AccountUsername,
+			&i.AccountAvatar,
+			&i.AccountRole,
 			&i.TotalReplies,
 			&i.TotalVotes,
 			&i.VoteState,

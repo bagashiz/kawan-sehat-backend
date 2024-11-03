@@ -3,6 +3,7 @@ package reply
 import (
 	"time"
 
+	"github.com/bagashiz/kawan-sehat-backend/internal/app/user"
 	"github.com/google/uuid"
 )
 
@@ -20,6 +21,8 @@ type Reply struct {
 type Account struct {
 	ID       uuid.UUID
 	Username string
+	Avatar   user.Avatar
+	Role     user.Role
 }
 
 // Vote represents a vote on a reply.

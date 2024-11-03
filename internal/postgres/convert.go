@@ -54,6 +54,7 @@ func (p SelectPostByIDRow) ToDomain() *post.Post {
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
 			Avatar:   user.Avatar(p.AccountAvatar),
+			Role:     user.Role(p.AccountRole),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -80,6 +81,7 @@ func (p SelectAllPostsRow) ToDomain() *post.Post {
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
 			Avatar:   user.Avatar(p.AccountAvatar),
+			Role:     user.Role(p.AccountRole),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -106,6 +108,7 @@ func (p SelectAllPostsPaginatedRow) ToDomain() *post.Post {
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
 			Avatar:   user.Avatar(p.AccountAvatar),
+			Role:     user.Role(p.AccountRole),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -132,6 +135,7 @@ func (p SelectPostsByAccountIDRow) ToDomain() *post.Post {
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
 			Avatar:   user.Avatar(p.AccountAvatar),
+			Role:     user.Role(p.AccountRole),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -158,6 +162,7 @@ func (p SelectPostsByAccountIDPaginatedRow) ToDomain() *post.Post {
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
 			Avatar:   user.Avatar(p.AccountAvatar),
+			Role:     user.Role(p.AccountRole),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -184,6 +189,7 @@ func (p SelectPostsByTopicIDRow) ToDomain() *post.Post {
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
 			Avatar:   user.Avatar(p.AccountAvatar),
+			Role:     user.Role(p.AccountRole),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -210,6 +216,7 @@ func (p SelectPostsByTopicIDPaginatedRow) ToDomain() *post.Post {
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
 			Avatar:   user.Avatar(p.AccountAvatar),
+			Role:     user.Role(p.AccountRole),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -236,6 +243,7 @@ func (p SelectBookmarksByAccountIDRow) ToDomain() *post.Post {
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
 			Avatar:   user.Avatar(p.AccountAvatar),
+			Role:     user.Role(p.AccountRole),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -262,6 +270,7 @@ func (p SelectBookmarksByAccountIDPaginatedRow) ToDomain() *post.Post {
 			ID:       p.AccountID,
 			Username: p.AccountUsername,
 			Avatar:   user.Avatar(p.AccountAvatar),
+			Role:     user.Role(p.AccountRole),
 		},
 		Topic: &post.Topic{
 			ID:   p.TopicID,
@@ -301,6 +310,8 @@ func (c SelectCommentsByPostIDRow) ToDomain() *comment.Comment {
 		Account: &comment.Account{
 			ID:       c.AccountID,
 			Username: c.AccountUsername,
+			Avatar:   user.Avatar(c.AccountAvatar),
+			Role:     user.Role(c.AccountRole),
 		},
 		Content: c.Content,
 		Vote: &comment.Vote{
@@ -320,6 +331,8 @@ func (c SelectCommentsByPostIDPaginatedRow) ToDomain() *comment.Comment {
 		Account: &comment.Account{
 			ID:       c.AccountID,
 			Username: c.AccountUsername,
+			Avatar:   user.Avatar(c.AccountAvatar),
+			Role:     user.Role(c.AccountRole),
 		},
 		Content: c.Content,
 		Vote: &comment.Vote{
@@ -352,6 +365,8 @@ func (r SelectRepliesByCommentIDRow) ToDomain() *reply.Reply {
 		Account: &reply.Account{
 			ID:       r.AccountID,
 			Username: r.AccountUsername,
+			Avatar:   user.Avatar(r.AccountAvatar),
+			Role:     user.Role(r.AccountRole),
 		},
 		Content: r.Content,
 		Vote: &reply.Vote{
@@ -363,19 +378,21 @@ func (r SelectRepliesByCommentIDRow) ToDomain() *reply.Reply {
 }
 
 // ToDomain converts postgres repository results to domain entities.
-func (c SelectRepliesByCommentIDPaginatedRow) ToDomain() *reply.Reply {
+func (r SelectRepliesByCommentIDPaginatedRow) ToDomain() *reply.Reply {
 	return &reply.Reply{
-		ID:        c.ID,
-		CommentID: c.CommentID,
+		ID:        r.ID,
+		CommentID: r.CommentID,
 		Account: &reply.Account{
-			ID:       c.AccountID,
-			Username: c.AccountUsername,
+			ID:       r.AccountID,
+			Username: r.AccountUsername,
+			Avatar:   user.Avatar(r.AccountAvatar),
+			Role:     user.Role(r.AccountRole),
 		},
-		Content: c.Content,
+		Content: r.Content,
 		Vote: &reply.Vote{
-			Total: c.TotalVotes.(int64),
-			State: c.VoteState.(int32),
+			Total: r.TotalVotes.(int64),
+			State: r.VoteState.(int32),
 		},
-		CreatedAt: c.CreatedAt,
+		CreatedAt: r.CreatedAt,
 	}
 }
