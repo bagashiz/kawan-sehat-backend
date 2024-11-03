@@ -35,4 +35,5 @@ LIMIT 1;
 
 -- name: SelectIllnessHistoriesByAccountID :many
 SELECT * FROM illness_histories
-WHERE account_id = $1;
+WHERE account_id = $1
+ORDER BY date DESC;

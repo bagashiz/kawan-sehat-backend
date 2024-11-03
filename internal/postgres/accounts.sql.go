@@ -109,6 +109,7 @@ func (q *Queries) SelectAccountByUsername(ctx context.Context, username string) 
 const selectIllnessHistoriesByAccountID = `-- name: SelectIllnessHistoriesByAccountID :many
 SELECT account_id, illness, date FROM illness_histories
 WHERE account_id = $1
+ORDER BY date DESC
 `
 
 func (q *Queries) SelectIllnessHistoriesByAccountID(ctx context.Context, accountID uuid.UUID) ([]IllnessHistory, error) {
