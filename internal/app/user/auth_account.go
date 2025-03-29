@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"time"
 )
 
 // RegisterAccountParams holds the parameters for the RegisterAccount method.
@@ -48,7 +49,7 @@ func (s *Service) LoginAccount(ctx context.Context, params LoginAccountParams) (
 		return nil, "", err
 	}
 
-	token, err := s.tokenizer.CreateToken(tokenPayload)
+	token, _, err := s.tokenizer.CreateToken(tokenPayload, 7*24*time.Hour)
 	if err != nil {
 		return nil, "", err
 	}

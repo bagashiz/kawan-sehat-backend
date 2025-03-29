@@ -73,7 +73,9 @@ func (r *PostgresRepository) GetPostByID(ctx context.Context, accountID, postID 
 }
 
 // ListPosts retrieves all posts data from postgres database.
-func (r *PostgresRepository) ListPosts(ctx context.Context, accountID uuid.UUID, limit, page int32) ([]*post.Post, int64, error) {
+func (r *PostgresRepository) ListPosts(
+	ctx context.Context, accountID uuid.UUID, limit, page int32,
+) ([]*post.Post, int64, error) {
 	offset := calculateOffset(limit, page)
 	results, err := r.fetchAllPosts(ctx, accountID, limit, offset)
 	if err != nil {

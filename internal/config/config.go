@@ -9,21 +9,21 @@ import (
 type (
 	// Config holds the application configuration.
 	Config struct {
-		App   *App
-		DB    *DB
-		Token *Token
+		app   *app
+		db    *db
+		token *token
 	}
 
-	// App holds the application configuration.
-	App struct {
+	// app holds the application configuration.
+	app struct {
 		Name string
 		Env  string
 		Host string
 		Port string
 	}
 
-	// DB holds the database configuration.
-	DB struct {
+	// db holds the database configuration.
+	db struct {
 		Type     string
 		Host     string
 		Port     string
@@ -33,11 +33,10 @@ type (
 		URI      string
 	}
 
-	// Token holds the token configuration.
-	Token struct {
-		Type     string
-		Secret   string
-		Duration string
+	// token holds the token configuration.
+	token struct {
+		Type   string
+		Secret string
 	}
 )
 
@@ -54,13 +53,13 @@ func New(getEnv func(string) string) (*Config, error) {
 	}
 
 	return &Config{
-		App: &App{
+		app: &app{
 			Name: getEnv("APP_NAME"),
 			Env:  getEnv("APP_ENV"),
 			Host: getEnv("APP_HOST"),
 			Port: getEnv("APP_PORT"),
 		},
-		DB: &DB{
+		db: &db{
 			Type:     getEnv("DB_TYPE"),
 			Host:     getEnv("DB_HOST"),
 			Port:     getEnv("DB_PORT"),
@@ -69,10 +68,21 @@ func New(getEnv func(string) string) (*Config, error) {
 			Name:     getEnv("DB_NAME"),
 			URI:      getEnv("DB_URI"),
 		},
-		Token: &Token{
-			Type:     getEnv("TOKEN_TYPE"),
-			Secret:   getEnv("TOKEN_SECRET"),
-			Duration: getEnv("TOKEN_DURATION"),
+		token: &token{
+			Type:   getEnv("TOKEN_TYPE"),
+			Secret: getEnv("TOKEN_SECRET"),
 		},
 	}, nil
+}
+
+func (c *Config) App() app {
+	return *c.app
+}
+
+func (c *Config) DB() db {
+	return *c.db
+}
+
+func (c *Config) Token() token {
+	return *c.token
 }

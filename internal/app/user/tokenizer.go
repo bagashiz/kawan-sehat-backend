@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -18,7 +19,7 @@ const (
 
 // Tokenizer is the interface for interacting with token providers.
 type Tokenizer interface {
-	CreateToken(payload *TokenPayload) (string, error)
+	CreateToken(payload *TokenPayload, duration time.Duration) (string, time.Time, error)
 	VerifyToken(token string) (*TokenPayload, error)
 }
 

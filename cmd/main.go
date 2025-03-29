@@ -46,20 +46,20 @@ func run(ctx context.Context, getEnv func(string) string) error {
 		return err
 	}
 
-	tknzr, err := token.New(cfg.Token)
+	tknzr, err := token.New(cfg.Token().Type, cfg.Token().Secret)
 	if err != nil {
 		return err
 	}
 
-	db, err := postgres.Connect(ctx, cfg.DB.URI)
+	db, err := postgres.NewDB(ctx, cfg.DB().URI)
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	slog.Info("connected to the database", "type", cfg.DB.Type)
+	slog.Info("connected to the database", "type", cfg.DB().Type)
 
-	if err := db.Migrate(); err != nil {
+	if err := postgres.Migrate(ctx, cfg.DB().URI, postgres.MigrationDirectionUp); err != nil {
 		return err
 	}
 
@@ -76,7 +76,10 @@ func run(ctx context.Context, getEnv func(string) string) error {
 		vldtr, userSvc, topicSvc, postSvc, commentSvc, replySvc,
 	)
 	mw := middleware.New(tknzr)
-	srv := server.New(cfg.App, hndlr, mw)
+	srv := server.New(server.Config{
+		Host: cfg.App().Host,
+		Port: cfg.App().Port,
+	}, hndlr, mw)
 
 	slog.Info("starting the http server", "addr", srv.Addr)
 
